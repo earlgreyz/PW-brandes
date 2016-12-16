@@ -68,3 +68,49 @@ for each s : V { // in parallel
 }
 
 ```
+
+
+## Wejście i wyjście
+
+Programy będą testowane automatycznie. Prosimy o ścisłe przestrzeganie podanych poniżej: formatowania nazw plików oraz wejścia i wyjścia programów.
+
+### Sposób uruchomienia programu
+
+```
+$ unzip xx123456; cd xx123456; mkdir build; cd build; cmake ..; make
+```
+```
+$ ./brandes liczba-wątków plik-wejsciowy plik-wyjsciowy
+```
+
+### Wejście
+
+Plik wejściowy opisuje krawędzie w grafie w formacie `<wierzchołek1>` `<wierzchołek2>`. Graf jest **skierowany**. Krawędzie są **posortowane** po pierwszym wierzchołku i po drugim wierzchołku. **Wierzchołki nie muszą być numerowane sekwencyjnie** _(tzn. poprawny jest graf bez np. wierzchołka o numerze 0)_. **Graf nie musi być spójny!**
+
+Program powinien przeprowadzać obliczenia używając `liczba-wątków` wątków. W testach wydajnościowych będzie zdecydowanie więcej wierzchołków niż wątków, ale musisz zapewnić poprawne działanie programu dla `liczba-wątków < 100` **niezależnie od liczby wierzchołków**.
+
+Przykładowe wejście:
+
+```
+0 2
+2 0
+2 3
+2 4
+3 2
+3 5
+3 6
+```
+
+### Wyjście
+
+Plik wyjściowy składa się z dokładnie tylu linii, ile jest wierzchołków z co najmniej jedną krawędzią wychodzącą. i-ta linia zawiera dwie liczby: liczbę całkowitą — _identyfikator wierzchołka_, oraz liczbę rzeczywistą — _pośrednictwo tego wierzchołka_. Wyjście musi być **posortowane po pierwszej kolumnie**.
+
+Standardowe wyjście programu będzie ignorowane.
+
+Plik wyjściowy odpowiadający przykładowemu plikowi wejściowemu:
+
+```
+0 0
+2 6
+3 4
+```
