@@ -114,3 +114,15 @@ Plik wyjściowy odpowiadający przykładowemu plikowi wejściowemu:
 2 6
 3 4
 ```
+
+## Forma oddania zadania
+
+Prosimy o oddanie pojedynczego pliku .zip zawierającego pojedynczy katalog odpowiadający loginowi _(ab123456)_, a w nim następujące pliki:
+
+* kod źródłowy;
+* CMakeLists.txt;
+* raport w pliku raport.pdf
+
+W raporcie opisz twoją implementację i zastosowane optymalizacje. Dla grafu `wiki-vote-sort.txt` zmierz speed-up, czyli zmierz czas działania twojego programu pm dla `m = 1, 2, ..., 8` wątków, a następnie oblicz przyspieszenie: <code>S<sub>m</sub>=p<sub>1</sub>/p<sub>m</sub></code>.
+
+`CMakeLists.txt` powinien kompilować program do jak najszybszej wersji: pamiętaj o włączeniu optymalizacji kompilatora i wyłączeniu debugowania.
