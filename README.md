@@ -131,6 +131,15 @@ W raporcie opisz twoją implementację i zastosowane optymalizacje. Dla grafu `w
 
 Będziemy oceniać **poprawność**, **wydajność** oraz **raport**.
 
-Poprawność będziemy oceniać porównując wyniki implementacji z naszym rozwiązaniem wzorcowym; nasze testy biorą pod uwagę błędy zaokrągleń. Udostępniamy dwa przykładowe testy, ale nie wyczerpują one wszystkich przypadków brzegowych — pamiętaj o dodaniu własnych testów. Nie będziemy oceniać wydajności programów niepoprawnych.
+Poprawność będziemy oceniać porównując wyniki implementacji z naszym rozwiązaniem wzorcowym; nasze testy biorą pod uwagę błędy zaokrągleń. Udostępniamy dwa przykładowe testy, ale nie wyczerpują one wszystkich przypadków brzegowych - pamiętaj o dodaniu własnych testów. Nie będziemy oceniać wydajności programów niepoprawnych.
 
 Szybkość działania będziemy oceniać porównując czas działania waszych implementacji na sieciach "społecznych" _(tzn. nie Erdős'a–Rényi'ego)_. Pojedyncze wykonanie programu będziemy ograniczać do kilku (max. 5) minut.
+
+
+## Dodatkowe materiały
+
+Prosimy o niekorzystanie z kodów źródłowych - gotowych implementacji algorytmu Brandesa. Zalecamy natomiast przeczytanie następujących prac:
+
+* A faster algorithm for betweenness centrality, U Brandes, Journal of Mathematical Sociology, 2001 Taylor & Francis, https://kops.uni-konstanz.de/bitstream/handle/123456789/5739/algorithm.pdf?sequence=1
+* Parallel algorithms for evaluating centrality indices in real-world networks DA Bader, K Madduri, https://smartech.gatech.edu/bitstream/handle/1853/14428/GT-CSE-06-13.pdf
+* Dane do testów wydajnościowych można wziąć z http://snap.stanford.edu/data/
