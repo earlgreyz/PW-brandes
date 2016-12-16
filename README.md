@@ -126,3 +126,11 @@ Prosimy o oddanie pojedynczego pliku .zip zawierającego pojedynczy katalog odpo
 W raporcie opisz twoją implementację i zastosowane optymalizacje. Dla grafu `wiki-vote-sort.txt` zmierz speed-up, czyli zmierz czas działania twojego programu pm dla `m = 1, 2, ..., 8` wątków, a następnie oblicz przyspieszenie: <code>S<sub>m</sub>=p<sub>1</sub>/p<sub>m</sub></code>.
 
 `CMakeLists.txt` powinien kompilować program do jak najszybszej wersji: pamiętaj o włączeniu optymalizacji kompilatora i wyłączeniu debugowania.
+
+## Kryteria oceny
+
+Będziemy oceniać **poprawność**, **wydajność** oraz **raport**.
+
+Poprawność będziemy oceniać porównując wyniki implementacji z naszym rozwiązaniem wzorcowym; nasze testy biorą pod uwagę błędy zaokrągleń. Udostępniamy dwa przykładowe testy, ale nie wyczerpują one wszystkich przypadków brzegowych — pamiętaj o dodaniu własnych testów. Nie będziemy oceniać wydajności programów niepoprawnych.
+
+Szybkość działania będziemy oceniać porównując czas działania waszych implementacji na sieciach "społecznych" _(tzn. nie Erdős'a–Rényi'ego)_. Pojedyncze wykonanie programu będziemy ograniczać do kilku (max. 5) minut.
