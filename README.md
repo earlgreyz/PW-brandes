@@ -69,7 +69,6 @@ for each s : V { // in parallel
 
 ```
 
-
 ## Wejście i wyjście
 
 Programy będą testowane automatycznie. Prosimy o ścisłe przestrzeganie podanych poniżej: formatowania nazw plików oraz wejścia i wyjścia programów.
@@ -133,8 +132,7 @@ Będziemy oceniać **poprawność**, **wydajność** oraz **raport**.
 
 Poprawność będziemy oceniać porównując wyniki implementacji z naszym rozwiązaniem wzorcowym; nasze testy biorą pod uwagę błędy zaokrągleń. Udostępniamy dwa przykładowe testy, ale nie wyczerpują one wszystkich przypadków brzegowych - pamiętaj o dodaniu własnych testów. Nie będziemy oceniać wydajności programów niepoprawnych.
 
-Szybkość działania będziemy oceniać porównując czas działania waszych implementacji na sieciach "społecznych" _(tzn. nie Erdős'a–Rényi'ego)_. Pojedyncze wykonanie programu będziemy ograniczać do kilku (max. 5) minut.
-
+Szybkość działania będziemy oceniać porównując czas działania waszych implementacji na sieciach "społecznych", tzn. nie Erdős'a - Rényi'ego. Pojedyncze wykonanie programu będziemy ograniczać do kilku (max. 5) minut.
 
 ## Dodatkowe materiały
 
@@ -143,3 +141,13 @@ Prosimy o niekorzystanie z kodów źródłowych - gotowych implementacji algoryt
 * A faster algorithm for betweenness centrality, U Brandes, Journal of Mathematical Sociology, 2001 Taylor & Francis, https://kops.uni-konstanz.de/bitstream/handle/123456789/5739/algorithm.pdf?sequence=1
 * Parallel algorithms for evaluating centrality indices in real-world networks DA Bader, K Madduri, https://smartech.gatech.edu/bitstream/handle/1853/14428/GT-CSE-06-13.pdf
 * Dane do testów wydajnościowych można wziąć z http://snap.stanford.edu/data/
+
+## FAQ
+
+* **Dokładność obliczeń**
+
+  Proszę używać liczb zmiennoprzecinkowych o podwójnej precyzji.
+
+* **Czy możemy założyc, że wejście jest poprawne?**
+
+  Tak. Czyli program może zachowywać się nieprzewidywalnie dla wejść niespełniających specyfikacji.
