@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include "brandes.h"
 
 size_t threads_count;
 std::string input_filename;
@@ -39,6 +40,8 @@ int main(int argc, char *argv[]) {
         usage();
         return EXIT_FAILURE;
     }
+
+    Brandes brandes{ threads_count, input_filename, output_filename };
 
     return EXIT_SUCCESS;
 }
