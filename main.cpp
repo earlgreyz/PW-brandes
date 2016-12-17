@@ -11,6 +11,14 @@ void usage() {
     std::cerr << "Usage: " << std::endl;
 }
 
+template <typename T>
+void parse_argument(const char *input, T &output, const std::string &error) {
+    std::istringstream parser{ input };
+    if (!(parser >> output)) {
+        throw std::invalid_argument(error);
+    }
+}
+
 void parse_args(const int &argc,  char * const argv[]) {
     if (argc < 4) {
         throw std::invalid_argument("Not enough arguments");
@@ -18,22 +26,9 @@ void parse_args(const int &argc,  char * const argv[]) {
         throw std::invalid_argument("Too many arguments");
     }
 
-    std::istringstream parser{ argv[1] };
-    if (!(parser >> threads_count) || threads_count > 100) {
-        throw std::invalid_argument("Threads count must be an unsigned integer smaller than 100");
-    }
-
-    parser.str(argv[2]);
-    parser.clear();
-    if (!(parser >> input_filename)) {
-        throw std::invalid_argument("Invalid input filename");
-    }
-
-    parser.str(argv[3]);
-    parser.clear();
-    if (!(parser >> output_filename)) {
-        throw std::invalid_argument("Invalid output filename");
-    }
+    parse_argument<size_t>(argv[1], threads_count, "Threads count must be an unsigned integer");
+    parse_argument<std::string>(argv[2], input_filename,  "Invalid input filename");
+    parse_argument<std::string>(argv[3], output_filename, "Invalid output filename");
 }
 
 int main(int argc, char *argv[]) {
