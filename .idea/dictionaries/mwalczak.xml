@@ -2,6 +2,7 @@
   <dictionary name="mwalczak">
     <words>
       <w>brandes</w>
+      <w>threadsafe</w>
     </words>
   </dictionary>
 </component>
