@@ -41,7 +41,12 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    Brandes brandes{ threads_count, input_filename, output_filename };
+    try {
+        Brandes brandes{ threads_count, input_filename, output_filename };
+        brandes.calculate();
+    } catch (...) {
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
