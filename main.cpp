@@ -2,7 +2,10 @@
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
-#include "brandes.h"
+#include <fstream>
+
+#include "graph.h"
+#include "betweenness.h"
 
 size_t threads_count;
 std::string input_filename;
@@ -42,8 +45,11 @@ int main(int argc, char *argv[]) {
     }
 
     try {
-        Brandes brandes{ threads_count, input_filename, output_filename };
-        brandes.calculate();
+        Brandes::Graph graph;
+        std::ifstream input_file(input_filename);
+        graph.load(input_file);
+        Brandes::betweenness(threads_count, graph);
+        graph.save(std::cout);
     } catch (...) {
         return EXIT_FAILURE;
     }
