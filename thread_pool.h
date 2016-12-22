@@ -117,9 +117,7 @@ auto ThreadPool::add(Func&& func, Args&&... args) -> std::future<typename std::r
         });
     }
 
-    // let a waiting thread know there is an available job
     jobs_available.notify_one();
-
     return future;
 }
 
