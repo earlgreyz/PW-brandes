@@ -14,5 +14,5 @@ macro (add_executable _name)
     endif()
 endmacro()
 
-set(SOURCE_FILES main.cpp betweenness.h betweenness.cpp thread_pool.h thread_pool.cpp graph.cpp graph.h)
+set(SOURCE_FILES main.cpp betweenness.h betweenness.cpp thread_pool.h thread_pool.cpp graph.cpp graph.h countdown_latch.cpp countdown_latch.h)
 add_executable(brandes ${SOURCE_FILES})

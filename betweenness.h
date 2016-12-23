@@ -1,6 +1,7 @@
 #ifndef BRANDES_BETWEENNESS_H
 #define BRANDES_BETWEENNESS_H
 
+
 #include <cstddef>
 #include "graph.h"
 
