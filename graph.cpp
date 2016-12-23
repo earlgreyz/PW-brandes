@@ -1,38 +1,77 @@
+#include <algorithm>
 #include "graph.h"
 
-
 namespace Brandes {
-    Graph::Node::Node(Brandes::Graph::T id, std::vector<Brandes::Graph::T> neighbours)
-            : id(id), neighbours(neighbours), weight(0) {}
+
+    Node::Node(IdentifierType id) : id(id), weight(0), order(0u) {
+
+    }
+
+    const size_t Node::get_order() const {
+        return order;
+    }
+
+    const std::vector<std::shared_ptr<Node>> &Node::get_neighbours() const {
+        return neighbours;
+    }
+
+    Node &Node::operator+=(WeightType weight) {
+        this->weight += weight;
+        return *this;
+    }
+
+    std::shared_ptr<Node> Graph::create_node(IdentifierType id) {
+        std::shared_ptr<Node> node = std::make_shared<Node>(id);
+        nodes[id] = node;
+        return node;
+    }
+
+    std::shared_ptr<Node> Graph::get_node(IdentifierType id) {
+        std::shared_ptr<Node> node = nullptr;
+        try {
+            node = nodes.at(id);
+        } catch (std::out_of_range e) {
+            node = create_node(id);
+        }
+        return node;
+    }
+
+    void Graph::reorder() {
+        size_t order = 0u;
+        for (auto &node : nodes) {
+            node.second->order = order++;
+        }
+    }
 
     void Graph::load(std::istream &istream) {
-        T in, out;
+        IdentifierType in, out;
         while (istream >> in >> out) {
-            try {
-                nodes.at(in).neighbours.push_back(out);
-            } catch (std::out_of_range e) {
-                nodes.emplace(std::make_pair(in, Node{in, { out }}));
+            std::shared_ptr<Node> node = get_node(in);
+            std::shared_ptr<Node> neighbour = get_node(out);
+            node->neighbours.push_back(neighbour);
+        }
+        reorder();
+    }
+
+    void Graph::save(std::ostream &ostream) const {
+        for (const auto &node : nodes) {
+            if (node.second->neighbours.size() > 0) {
+                ostream << node.second->id << " " << node.second->weight << std::endl;
             }
         }
     }
 
-    void Graph::save(std::ostream &ostream) const {
-        for (auto node : nodes) {
-            ostream << node.second.id << " " << node.second.weight << std::endl;
-        }
-    }
-
     void Graph::clear_weights() {
-        for (auto node : nodes) {
-            node.second.weight = 0;
+        for (auto &node : nodes) {
+            node.second->weight = 0;
         }
     }
 
-    const std::vector<Graph::T> &Graph::get_neighbours(Graph::T id) const {
-        return nodes.at(id).neighbours;
+    const std::map<IdentifierType, std::shared_ptr<Node>> Graph::get_nodes() const {
+        return nodes;
     }
 
-    Graph::W &Graph::operator[](Graph::T id) {
-        return nodes.at(id).weight;
+    const size_t Graph::get_size() const {
+        return nodes.size();
     }
 }

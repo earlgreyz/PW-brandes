@@ -6,28 +6,40 @@
 #include <string>
 #include <map>
 #include <fstream>
+#include <memory>
+#include <array>
 
 namespace Brandes {
+    using IdentifierType = unsigned int;
+    using WeightType = double;
+
+    class Node {
+        friend class Graph;
+    private:
+        std::vector<std::shared_ptr<Node>> neighbours;
+        IdentifierType id;
+        size_t order;
+        WeightType weight;
+    public:
+        Node(IdentifierType id);
+        const std::vector<std::shared_ptr<Node>> &get_neighbours() const;
+        const size_t get_order() const;
+        Node &operator+=(WeightType weight);
+    };
+
     class Graph {
     private:
-        using T = unsigned int;
-        using W = double;
+        std::map<IdentifierType, std::shared_ptr<Node>> nodes;
+        std::shared_ptr<Node> create_node(IdentifierType id);
+        std::shared_ptr<Node> get_node(IdentifierType id);
+        void reorder();
 
-        struct Node {
-            T id;
-            std::vector<T> neighbours;
-            W weight;
-
-            Node(T id, std::vector<T> neighbours);
-        };
-
-        std::map<T, Node> nodes;
     public:
         void load(std::istream &istream);
         void save(std::ostream &ostream) const;
         void clear_weights();
-        const std::vector<T>& get_neighbours(T id) const;
-        W& operator[](T id);
+        const std::map<IdentifierType, std::shared_ptr<Node>> get_nodes() const;
+        const size_t get_size() const;
     };
 }
 
