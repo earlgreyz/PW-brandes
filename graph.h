@@ -14,17 +14,20 @@ namespace Brandes {
         using W = double;
 
         struct Node {
-            Node(T identifier, std::vector<T> edges);
-
-            T identifier;
-            std::vector<T> edges;
+            T id;
+            std::vector<T> neighbours;
             W weight;
+
+            Node(T id, std::vector<T> neighbours);
         };
 
         std::map<T, Node> nodes;
     public:
         void load(std::istream &istream);
         void save(std::ostream &ostream) const;
+        void clear_weights();
+        const std::vector<T>& get_neighbours(T id) const;
+        W& operator[](T id);
     };
 }
 
