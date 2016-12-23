@@ -2,12 +2,12 @@
 #define BRANDES_GRAPH_H
 
 
+#include <cstddef>
 #include <vector>
 #include <string>
 #include <map>
 #include <fstream>
 #include <memory>
-#include <array>
 
 namespace Brandes {
     using IdentifierType = unsigned int;
