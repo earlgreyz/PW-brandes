@@ -5,7 +5,7 @@
 #include "graph.h"
 
 namespace Brandes {
-    void betweenness(const size_t &threads_count, const Graph &graph);
+    void betweenness(const size_t &threads_count, Graph &graph);
 }
 
 

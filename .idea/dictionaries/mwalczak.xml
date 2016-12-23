@@ -3,6 +3,8 @@
     <words>
       <w>betweenness</w>
       <w>brandes</w>
+      <w>istream</w>
+      <w>ostream</w>
       <w>threadsafe</w>
     </words>
   </dictionary>
