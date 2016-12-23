@@ -3,7 +3,7 @@
 
 namespace Brandes {
 
-    Node::Node(IdentifierType id) : id(id), weight(0), order(0u) {
+    Node::Node(IdentifierType id) : id(id), order(0u), weight(0) {
 
     }
 
