@@ -8,7 +8,7 @@ namespace {
     void worker(Brandes::Graph &graph, const std::shared_ptr<Brandes::Node> &node) {
         std::stack<std::shared_ptr<Brandes::Node>> stack;
         std::queue<std::shared_ptr<Brandes::Node>> queue;
-        std::vector<std::shared_ptr<Brandes::Node>> predecessors[graph.get_size()];
+        std::vector<size_t> predecessors[graph.get_size()];
         size_t shortest_paths[graph.get_size()];
         long long distance[graph.get_size()];
         Brandes::WeightType delta[graph.get_size()];
@@ -35,7 +35,7 @@ namespace {
                 }
                 if (distance[neighbour->get_order()] == distance[current_node->get_order()] + 1) {
                     shortest_paths[neighbour->get_order()] += shortest_paths[current_node->get_order()];
-                    predecessors[neighbour->get_order()].push_back(current_node);
+                    predecessors[neighbour->get_order()].push_back(current_node->get_order());
                 }
             }
         }
@@ -43,8 +43,8 @@ namespace {
         while (!stack.empty()) {
             std::shared_ptr<Brandes::Node> &current_node = stack.top();
             stack.pop();
-            for (auto &neighbour : predecessors[current_node->get_order()]) {
-                delta[neighbour->get_order()] += shortest_paths[neighbour->get_order()] / shortest_paths[current_node->get_order()] * (1 + delta[current_node->get_order()]);
+            for (const auto &predecessor : predecessors[current_node->get_order()]) {
+                delta[predecessor] += shortest_paths[predecessor] / shortest_paths[current_node->get_order()] * (1 + delta[current_node->get_order()]);
             }
             if (current_node->get_order() != node->get_order()) {
                 *current_node += delta[current_node->get_order()];
