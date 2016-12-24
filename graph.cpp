@@ -11,7 +11,7 @@ namespace Brandes {
         return order;
     }
 
-    const std::vector<std::shared_ptr<Node>> &Node::get_neighbours() const {
+    const std::vector<std::weak_ptr<Node>> &Node::get_neighbours() const {
         return neighbours;
     }
 
@@ -46,8 +46,8 @@ namespace Brandes {
     void Graph::load(std::istream &istream) {
         IdentifierType in, out;
         while (istream >> in >> out) {
-            std::shared_ptr<Node> node = get_node(in);
-            std::shared_ptr<Node> neighbour = get_node(out);
+            std::shared_ptr<Brandes::Node> node = get_node(in);
+            std::weak_ptr<Brandes::Node> neighbour = get_node(out);
             node->neighbours.push_back(neighbour);
         }
         reorder();

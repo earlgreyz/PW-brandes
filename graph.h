@@ -16,13 +16,13 @@ namespace Brandes {
     class Node {
         friend class Graph;
     private:
-        std::vector<std::shared_ptr<Node>> neighbours;
+        std::vector<std::weak_ptr<Node>> neighbours;
         IdentifierType id;
         size_t order;
         WeightType weight;
     public:
         Node(IdentifierType id);
-        const std::vector<std::shared_ptr<Node>> &get_neighbours() const;
+        const std::vector<std::weak_ptr<Node>> &get_neighbours() const;
         const size_t get_order() const;
         Node &operator+=(WeightType weight);
     };

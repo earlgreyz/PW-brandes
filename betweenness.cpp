@@ -40,6 +40,7 @@ namespace {
                           BrandesData &_,
                           const std::shared_ptr<Brandes::Node> &current_node,
                           const std::shared_ptr<Brandes::Node> &neighbour) {
+
         if (_.distance[neighbour->get_order()] < 0) {
             {
                 std::unique_lock<std::mutex> lock(_.mutex);
@@ -47,16 +48,19 @@ namespace {
             }
             _.distance[neighbour->get_order()] = _.distance[current_node->get_order()] + 1;
         }
+
         if (_.distance[neighbour->get_order()] == _.distance[current_node->get_order()] + 1) {
             _.shortest_paths[neighbour->get_order()] += _.shortest_paths[current_node->get_order()];
             _.predecessors[neighbour->get_order()].push_back(current_node->get_order());
         }
+
         countdown_latch.count_down();
     }
 
     void worker(Synchronization::ThreadPool &thread_pool,
                 Brandes::Graph &graph,
                 const std::shared_ptr<Brandes::Node> &node) {
+
         BrandesData _(graph.get_size());
         _.shortest_paths[node->get_order()] = 1;
         _.distance[node->get_order()] = 0;
@@ -67,12 +71,14 @@ namespace {
             _.queue.pop();
             _.stack.push(current_node);
             Synchronization::CountDownLatch countdown_latch{ current_node->get_neighbours().size() };
-            for (const auto &neighbour : current_node->get_neighbours()) {
-                thread_pool.add(neighbour_worker,
-                                 std::reference_wrapper<Synchronization::CountDownLatch>(countdown_latch),
-                                 std::reference_wrapper<BrandesData>(_),
-                                 std::reference_wrapper<const std::shared_ptr<Brandes::Node>>(current_node),
-                                 std::reference_wrapper<const std::shared_ptr<Brandes::Node>>(neighbour)
+            for (const auto &neighbour_weak : current_node->get_neighbours()) {
+                std::shared_ptr<Brandes::Node> neighbour = neighbour_weak.lock();
+                thread_pool.add(
+                        neighbour_worker,
+                        std::reference_wrapper<Synchronization::CountDownLatch>(countdown_latch),
+                        std::reference_wrapper<BrandesData>(_),
+                        std::reference_wrapper<const std::shared_ptr<Brandes::Node>>(current_node),
+                        std::reference_wrapper<const std::shared_ptr<Brandes::Node>>(neighbour)
                 );
             }
             countdown_latch.await();
@@ -97,10 +103,11 @@ namespace Brandes {
         graph.clear_weights();
 
         for (const auto &node : graph.get_nodes()) {
-            thread_pool.add(worker,
-                            std::reference_wrapper<Synchronization::ThreadPool>(thread_pool),
-                            std::reference_wrapper<Graph>(graph),
-                            std::reference_wrapper<const std::shared_ptr<Node>>(node.second)
+            thread_pool.add(
+                    worker,
+                    std::reference_wrapper<Synchronization::ThreadPool>(thread_pool),
+                    std::reference_wrapper<Graph>(graph),
+                    std::reference_wrapper<const std::shared_ptr<Node>>(node.second)
             );
         }
         thread_pool.wait();
