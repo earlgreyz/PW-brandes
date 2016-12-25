@@ -18,10 +18,13 @@ namespace {
         std::vector<size_t> shortest_paths;
         std::vector<long long> distance;
         std::vector<Brandes::WeightType> delta;
+        mutable std::mutex mutex;
 
         void init(const std::shared_ptr<Brandes::Node> &node);
         void apply(const std::shared_ptr<Brandes::Node> &node);
     public:
+        BrandesWorker(const BrandesWorker&) = delete;
+        BrandesWorker(BrandesWorker&&) = delete;
         BrandesWorker(Brandes::Graph &graph);
         void compute(const std::shared_ptr<Brandes::Node> &node);
     };
@@ -48,6 +51,7 @@ namespace {
     }
 
     void BrandesWorker::compute(const std::shared_ptr<Brandes::Node> &node) {
+        std::lock_guard<std::mutex> lock(mutex);
         init(node);
 
         while (!queue.empty()) {
@@ -86,14 +90,14 @@ namespace {
             stack.pop();
 
             for (const auto &predecessor : predecessors[order_c]) {
-                size_t short_p = shortest_paths[predecessor];
-                size_t short_c = shortest_paths[order_c];
+                Brandes::WeightType short_p = shortest_paths[predecessor];
+                Brandes::WeightType short_c = shortest_paths[order_c];
                 Brandes::WeightType delta_c = delta[order_c];
                 delta[predecessor] += (short_p / short_c) * (1 + delta_c);
             }
 
             if (order_c != order_n) {
-                *current_node += delta[order_c];
+                current_node->increaseWeight(delta[order_c]);
             }
         }
     }
@@ -105,13 +109,12 @@ namespace Brandes {
         graph.clear_weights();
 
         for (const auto &node : graph.get_nodes()) {
-            std::shared_ptr<BrandesWorker> worker =
-                    std::make_shared<BrandesWorker>(graph);
-
-            thread_pool.add([worker, &node] {
-                return worker->compute(node.second);
+            thread_pool.add([&graph, &node] {
+               BrandesWorker(graph).compute(node.second);
             });
         }
         thread_pool.wait();
+        // Hack
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }

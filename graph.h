@@ -20,13 +20,13 @@ namespace Brandes {
         std::vector<std::weak_ptr<Node>> neighbours;
         IdentifierType id;
         size_t order;
-        WeightType weight;
+        volatile WeightType weight;
         std::mutex mutex;
     public:
         Node(IdentifierType id);
         const std::vector<std::weak_ptr<Node>> &get_neighbours() const noexcept;
         const size_t get_order() const noexcept;
-        Node &operator+=(WeightType weight);
+        void increaseWeight(WeightType weight);
     };
 
     class Graph {
@@ -35,7 +35,6 @@ namespace Brandes {
         std::shared_ptr<Node> create_node(IdentifierType id);
         std::shared_ptr<Node> get_node(IdentifierType id);
         void reorder() noexcept;
-
     public:
         void load(std::istream &istream);
         void save(std::ostream &ostream) const;

@@ -16,10 +16,9 @@ namespace Brandes {
         return neighbours;
     }
 
-    Node &Node::operator+=(WeightType weight) {
-        std::unique_lock<std::mutex> lock(mutex);
+    void Node::increaseWeight(WeightType weight) {
+        std::lock_guard<std::mutex> lock(mutex);
         this->weight += weight;
-        return *this;
     }
 
     std::shared_ptr<Node> Graph::create_node(IdentifierType id) {
