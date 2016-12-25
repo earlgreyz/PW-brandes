@@ -101,8 +101,10 @@ namespace Brandes {
 
         for (const auto &node : graph.get_nodes()) {
             std::shared_ptr<BrandesWorker> worker = std::make_shared<BrandesWorker>(graph);
-            std::thread t(&BrandesWorker::compute, worker, node.second);
-            t.join();
+            thread_pool.add([worker, &node] {
+                return worker->compute(node.second);
+            });
         }
+        thread_pool.wait();
     }
 }
