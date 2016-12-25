@@ -7,11 +7,12 @@ namespace Brandes {
 
     }
 
-    const size_t Node::get_order() const {
+    const size_t Node::get_order() const noexcept {
         return order;
     }
 
-    const std::vector<std::weak_ptr<Node>> &Node::get_neighbours() const {
+    const std::vector<std::weak_ptr<Node>> &Node::get_neighbours() const
+            noexcept {
         return neighbours;
     }
 
@@ -37,7 +38,7 @@ namespace Brandes {
         return node;
     }
 
-    void Graph::reorder() {
+    void Graph::reorder() noexcept {
         size_t order = 0u;
         for (auto &node : nodes) {
             node.second->order = order++;
@@ -57,22 +58,24 @@ namespace Brandes {
     void Graph::save(std::ostream &ostream) const {
         for (const auto &node : nodes) {
             if (node.second->neighbours.size() > 0) {
-                ostream << node.second->id << " " << node.second->weight << std::endl;
+                ostream << node.second->id << " "
+                        << node.second->weight << std::endl;
             }
         }
     }
 
-    void Graph::clear_weights() {
+    void Graph::clear_weights() noexcept {
         for (auto &node : nodes) {
             node.second->weight = 0;
         }
     }
 
-    const std::map<IdentifierType, std::shared_ptr<Node>> Graph::get_nodes() const {
+    const std::map<IdentifierType, std::shared_ptr<Node>> Graph::get_nodes()
+            const noexcept {
         return nodes;
     }
 
-    const size_t Graph::get_size() const {
+    const size_t Graph::get_size() const noexcept {
         return nodes.size();
     }
 }

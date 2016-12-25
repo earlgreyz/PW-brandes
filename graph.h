@@ -24,8 +24,8 @@ namespace Brandes {
         std::mutex mutex;
     public:
         Node(IdentifierType id);
-        const std::vector<std::weak_ptr<Node>> &get_neighbours() const;
-        const size_t get_order() const;
+        const std::vector<std::weak_ptr<Node>> &get_neighbours() const noexcept;
+        const size_t get_order() const noexcept;
         Node &operator+=(WeightType weight);
     };
 
@@ -34,14 +34,15 @@ namespace Brandes {
         std::map<IdentifierType, std::shared_ptr<Node>> nodes;
         std::shared_ptr<Node> create_node(IdentifierType id);
         std::shared_ptr<Node> get_node(IdentifierType id);
-        void reorder();
+        void reorder() noexcept;
 
     public:
         void load(std::istream &istream);
         void save(std::ostream &ostream) const;
-        void clear_weights();
-        const std::map<IdentifierType, std::shared_ptr<Node>> get_nodes() const;
-        const size_t get_size() const;
+        void clear_weights() noexcept;
+        const std::map<IdentifierType, std::shared_ptr<Node>> get_nodes() const
+                noexcept;
+        const size_t get_size() const noexcept;
     };
 }
 

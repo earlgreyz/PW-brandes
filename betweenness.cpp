@@ -3,7 +3,6 @@
 #include <stack>
 #include <queue>
 #include <iostream>
-#include <mutex>
 
 #include "thread_pool.h"
 #include "countdown_latch.h"
@@ -20,7 +19,6 @@ namespace {
         std::vector<long long> distance;
         std::vector<Brandes::WeightType> delta;
 
-        std::mutex mutex;
         void init(const std::shared_ptr<Brandes::Node> &node);
         void apply(const std::shared_ptr<Brandes::Node> &node);
     public:
@@ -54,20 +52,23 @@ namespace {
 
         while (!queue.empty()) {
             std::shared_ptr<Brandes::Node> &current_node = queue.front();
+            size_t order_c = current_node->get_order();
+
             queue.pop();
             stack.push(current_node);
 
-            Synchronization::CountDownLatch countdown_latch{ current_node->get_neighbours().size() };
             for (const auto &neighbour_weak : current_node->get_neighbours()) {
-                std::shared_ptr<Brandes::Node> neighbour = neighbour_weak.lock();
-                if (distance[neighbour->get_order()] < 0) {
+                auto neighbour = neighbour_weak.lock();
+                size_t order_n = neighbour->get_order();
+
+                if (distance[order_n] < 0) {
                     queue.push(neighbour);
-                    distance[neighbour->get_order()] = distance[current_node->get_order()] + 1;
+                    distance[order_n] = distance[order_c] + 1;
                 }
 
-                if (distance[neighbour->get_order()] == distance[current_node->get_order()] + 1) {
-                    shortest_paths[neighbour->get_order()] += shortest_paths[current_node->get_order()];
-                    predecessors[neighbour->get_order()].push_back(current_node->get_order());
+                if (distance[order_n] == distance[order_c] + 1) {
+                    shortest_paths[order_n] += shortest_paths[order_c];
+                    predecessors[order_n].push_back(order_c);
                 }
             }
         }
@@ -76,19 +77,23 @@ namespace {
     }
 
     void BrandesWorker::apply(const std::shared_ptr<Brandes::Node> &node) {
+        size_t order_n = node->get_order();
+
         while (!stack.empty()) {
             std::shared_ptr<Brandes::Node> &current_node = stack.top();
+            size_t order_c = current_node->get_order();
+
             stack.pop();
 
-            for (const auto &predecessor : predecessors[current_node->get_order()]) {
+            for (const auto &predecessor : predecessors[order_c]) {
                 size_t short_p = shortest_paths[predecessor];
-                size_t short_c = shortest_paths[current_node->get_order()];
-                Brandes::WeightType delta_c = delta[current_node->get_order()];
+                size_t short_c = shortest_paths[order_c];
+                Brandes::WeightType delta_c = delta[order_c];
                 delta[predecessor] += (short_p / short_c) * (1 + delta_c);
             }
 
-            if (current_node->get_order() != node->get_order()) {
-                *current_node += delta[current_node->get_order()];
+            if (order_c != order_n) {
+                *current_node += delta[order_c];
             }
         }
     }
@@ -100,7 +105,9 @@ namespace Brandes {
         graph.clear_weights();
 
         for (const auto &node : graph.get_nodes()) {
-            std::shared_ptr<BrandesWorker> worker = std::make_shared<BrandesWorker>(graph);
+            std::shared_ptr<BrandesWorker> worker =
+                    std::make_shared<BrandesWorker>(graph);
+
             thread_pool.add([worker, &node] {
                 return worker->compute(node.second);
             });
