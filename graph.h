@@ -8,6 +8,7 @@
 #include <map>
 #include <fstream>
 #include <memory>
+#include <mutex>
 
 namespace Brandes {
     using IdentifierType = unsigned int;
@@ -20,6 +21,7 @@ namespace Brandes {
         IdentifierType id;
         size_t order;
         WeightType weight;
+        std::mutex mutex;
     public:
         Node(IdentifierType id);
         const std::vector<std::weak_ptr<Node>> &get_neighbours() const;

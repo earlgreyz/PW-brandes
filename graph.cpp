@@ -16,6 +16,7 @@ namespace Brandes {
     }
 
     Node &Node::operator+=(WeightType weight) {
+        std::unique_lock<std::mutex> lock(mutex);
         this->weight += weight;
         return *this;
     }
