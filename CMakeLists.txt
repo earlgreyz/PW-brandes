@@ -14,5 +14,5 @@ macro (add_executable _name)
     endif()
 endmacro()
 
-set(SOURCE_FILES main.cpp betweenness.h betweenness.cpp graph.cpp graph.h)
+set(SOURCE_FILES main.cpp betweenness.h betweenness.cpp graph.cpp graph.h scheduler.h)
 add_executable(brandes ${SOURCE_FILES})

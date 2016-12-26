@@ -7,8 +7,10 @@
 #include <thread>
 #include <atomic>
 
+#include "scheduler.h"
+
 namespace {
-    class BrandesWorker {
+    class BrandesScope {
     private:
         Brandes::Graph &graph;
         std::stack<std::shared_ptr<Brandes::Node>> stack;
@@ -23,13 +25,13 @@ namespace {
         void init(const std::shared_ptr<Brandes::Node> &node);
         void apply(const std::shared_ptr<Brandes::Node> &node);
     public:
-        BrandesWorker(const BrandesWorker&) = delete;
-        BrandesWorker(BrandesWorker&&) = delete;
-        BrandesWorker(Brandes::Graph &graph);
-        void compute(const std::shared_ptr<Brandes::Node> &node);
+        BrandesScope(const BrandesScope&) = delete;
+        BrandesScope(BrandesScope&&) = delete;
+        BrandesScope(Brandes::Graph &graph);
+        void execute(const std::shared_ptr<Brandes::Node> &node);
     };
 
-    BrandesWorker::BrandesWorker(Brandes::Graph &graph) : graph(graph) {
+    BrandesScope::BrandesScope(Brandes::Graph &graph) : graph(graph) {
         size_t graph_size = graph.get_size();
         predecessors = std::vector<std::vector<size_t>>(graph_size);
         shortest_paths = std::vector<size_t>(graph_size);
@@ -37,7 +39,7 @@ namespace {
         delta = std::vector<Brandes::WeightType >(graph_size);
     }
 
-    void BrandesWorker::init(const std::shared_ptr<Brandes::Node> &node) {
+    void BrandesScope::init(const std::shared_ptr<Brandes::Node> &node) {
         for (size_t i = 0u; i < graph.get_size(); i++) {
             predecessors[i] = {};
             shortest_paths[i] = 0;
@@ -50,7 +52,7 @@ namespace {
         queue.push(node);
     }
 
-    void BrandesWorker::compute(const std::shared_ptr<Brandes::Node> &node) {
+    void BrandesScope::execute(const std::shared_ptr<Brandes::Node> &node) {
         std::lock_guard<std::mutex> lock(mutex);
         init(node);
 
@@ -80,7 +82,7 @@ namespace {
         apply(node);
     }
 
-    void BrandesWorker::apply(const std::shared_ptr<Brandes::Node> &node) {
+    void BrandesScope::apply(const std::shared_ptr<Brandes::Node> &node) {
         size_t order_n = node->get_order();
 
         while (!stack.empty()) {
@@ -101,97 +103,16 @@ namespace {
             }
         }
     }
-
-    class BrandesPool {
-    private:
-        std::size_t threads_waiting;
-        Brandes::Graph graph;
-
-        std::atomic_bool terminate;
-        std::mutex mutex;
-        std::condition_variable workers_condition;
-        std::condition_variable wait_condition;
-
-        std::vector<std::thread> workers;
-        std::queue<std::shared_ptr<Brandes::Node>> queue;
-
-        static void worker(BrandesPool* pool);
-    public:
-        BrandesPool(std::size_t threads_count, Brandes::Graph &graph);
-        ~BrandesPool();
-        void compute(const std::shared_ptr<Brandes::Node> &node);
-        void wait();
-    };
-
-    BrandesPool::BrandesPool(std::size_t threads_count, Brandes::Graph &graph)
-            : threads_waiting(0u), graph(graph), terminate(false) {
-        workers.reserve(threads_count);
-        for (std::size_t i = 0u; i < threads_count; i++) {
-            workers.emplace_back(worker, this);
-        }
-    }
-
-    void BrandesPool::worker(BrandesPool *pool) {
-        BrandesWorker brandes_worker{ pool->graph };
-
-        while (true) {
-            std::unique_lock<std::mutex> lock{ pool->mutex };
-            if (pool->queue.empty()) {
-                pool->threads_waiting++;
-                pool->wait_condition.notify_all();
-                pool->workers_condition.wait(lock, [&]{
-                   return pool->terminate || !pool->queue.empty();
-                });
-                pool->threads_waiting--;
-            }
-
-            if (pool->terminate) {
-                break;
-            }
-
-            auto node = std::move(pool->queue.front());
-            pool->queue.pop();
-            lock.unlock();
-
-            brandes_worker.compute(node);
-        }
-    }
-
-    void BrandesPool::compute(const std::shared_ptr<Brandes::Node> &node) {
-        std::lock_guard<std::mutex> lock{ mutex };
-        queue.push(node);
-        workers_condition.notify_one();
-    }
-
-    void BrandesPool::wait() {
-        std::unique_lock<std::mutex> lock{ mutex };
-        if (!queue.empty()) {
-            wait_condition.wait(lock, [&]{
-                return queue.empty();
-            });
-        }
-    }
-
-    BrandesPool::~BrandesPool() {
-        terminate = true;
-        workers_condition.notify_all();
-
-        for (auto &t : workers) {
-            if (t.joinable()) {
-                t.join();
-            }
-        }
-        wait_condition.notify_all();
-    }
 }
 
 namespace Brandes {
     void betweenness(const size_t &threads_count, Graph &graph) {
         graph.clear_weights();
-        BrandesPool brandes_pool{ threads_count, graph };
+        Scheduler<BrandesScope, Graph, std::shared_ptr<Node>>
+                scheduler{ threads_count, std::reference_wrapper<Graph>(graph) };
         for (const auto &node : graph.get_nodes()) {
-            brandes_pool.compute(node.second);
+            scheduler.schedule(node.second);
         }
-        brandes_pool.wait();
+        scheduler.join();
     }
 }
