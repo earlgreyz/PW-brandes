@@ -3,9 +3,9 @@
 #include <stack>
 #include <queue>
 #include <iostream>
-
-#include "thread_pool.h"
-#include "countdown_latch.h"
+#include <condition_variable>
+#include <thread>
+#include <atomic>
 
 namespace {
     class BrandesWorker {
@@ -101,20 +101,97 @@ namespace {
             }
         }
     }
+
+    class BrandesPool {
+    private:
+        std::size_t threads_waiting;
+        Brandes::Graph graph;
+
+        std::atomic_bool terminate;
+        std::mutex mutex;
+        std::condition_variable workers_condition;
+        std::condition_variable wait_condition;
+
+        std::vector<std::thread> workers;
+        std::queue<std::shared_ptr<Brandes::Node>> queue;
+
+        static void worker(BrandesPool* pool);
+    public:
+        BrandesPool(std::size_t threads_count, Brandes::Graph &graph);
+        ~BrandesPool();
+        void compute(const std::shared_ptr<Brandes::Node> &node);
+        void wait();
+    };
+
+    BrandesPool::BrandesPool(std::size_t threads_count, Brandes::Graph &graph)
+            : threads_waiting(0u), graph(graph), terminate(false) {
+        workers.reserve(threads_count);
+        for (std::size_t i = 0u; i < threads_count; i++) {
+            workers.emplace_back(worker, this);
+        }
+    }
+
+    void BrandesPool::worker(BrandesPool *pool) {
+        BrandesWorker brandes_worker{ pool->graph };
+
+        while (true) {
+            std::unique_lock<std::mutex> lock{ pool->mutex };
+            if (pool->queue.empty()) {
+                pool->threads_waiting++;
+                pool->wait_condition.notify_all();
+                pool->workers_condition.wait(lock, [&]{
+                   return pool->terminate || !pool->queue.empty();
+                });
+                pool->threads_waiting--;
+            }
+
+            if (pool->terminate) {
+                break;
+            }
+
+            auto node = std::move(pool->queue.front());
+            pool->queue.pop();
+            lock.unlock();
+
+            brandes_worker.compute(node);
+        }
+    }
+
+    void BrandesPool::compute(const std::shared_ptr<Brandes::Node> &node) {
+        std::lock_guard<std::mutex> lock{ mutex };
+        queue.push(node);
+        workers_condition.notify_one();
+    }
+
+    void BrandesPool::wait() {
+        std::unique_lock<std::mutex> lock{ mutex };
+        if (!queue.empty()) {
+            wait_condition.wait(lock, [&]{
+                return queue.empty();
+            });
+        }
+    }
+
+    BrandesPool::~BrandesPool() {
+        terminate = true;
+        workers_condition.notify_all();
+
+        for (auto &t : workers) {
+            if (t.joinable()) {
+                t.join();
+            }
+        }
+        wait_condition.notify_all();
+    }
 }
 
 namespace Brandes {
     void betweenness(const size_t &threads_count, Graph &graph) {
-        Synchronization::ThreadPool thread_pool{ threads_count };
         graph.clear_weights();
-
+        BrandesPool brandes_pool{ threads_count, graph };
         for (const auto &node : graph.get_nodes()) {
-            thread_pool.add([&graph, &node] {
-               BrandesWorker(graph).compute(node.second);
-            });
+            brandes_pool.compute(node.second);
         }
-        thread_pool.wait();
-        // Hack
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        brandes_pool.wait();
     }
 }
