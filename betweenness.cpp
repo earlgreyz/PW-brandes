@@ -99,7 +99,7 @@ namespace {
             }
 
             if (order_c != order_n) {
-                current_node->increaseWeight(delta[order_c]);
+                current_node->increase_weight(delta[order_c]);
             }
         }
     }

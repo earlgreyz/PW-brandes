@@ -16,7 +16,7 @@ namespace Brandes {
         return neighbours;
     }
 
-    void Node::increaseWeight(WeightType weight) {
+    void Node::increase_weight(WeightType weight) {
         std::lock_guard<std::mutex> lock(mutex);
         this->weight += weight;
     }
