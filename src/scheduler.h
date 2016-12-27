@@ -15,7 +15,7 @@
  * @tparam Scope class to
  * @tparam ScopeArgs argument of the constructor - has to be given explicitly
  * (up until to c++17 it cannot be deduced from context)
- * @tparam Task type to the schedule (argument of Scope::execute function) -
+ * @tparam Task type to be scheduled (argument of the Scope::execute function) -
  * has to be given explicitly
  */
 template <typename Scope, typename ScopeArgs, typename Task>
@@ -31,24 +31,24 @@ private:
      */
     std::atomic_bool terminating;
     /**
-     * Mutex to guarantee thread safety
+     * Mutex to guarantee thread safety.
      */
     std::mutex mutex;
     /**
-     * Condition for workers to wait for tasks
+     * Condition for workers to wait for tasks.
      */
     std::condition_variable workers_condition;
     /**
-     * Condition for threads to wait for all workers to finish
+     * Condition for threads to wait for all workers to finish.
      */
     std::condition_variable wait_condition;
 
     /**
-     * Vector of worker threads
+     * Vector of worker threads.
      */
     std::vector<std::thread> threads;
     /**
-     * Queue of scheduled tasks
+     * Queue of scheduled tasks.
      */
     std::queue<Task> tasks;
 
@@ -60,8 +60,8 @@ private:
 public:
     /**
      * Creates new scheduler.
-     * @param threads_count - number of threads to be used by scheduler.
-     * @param args - argument to be passed to Scope instances
+     * @param threads_count number of threads to be used by scheduler.
+     * @param args argument to be passed to Scope instances
      */
     Scheduler(std::size_t threads_count, ScopeArgs args);
     ~Scheduler();
@@ -76,7 +76,7 @@ public:
     /**
      * Schedule new task.
      * Scheduled task will be performed in FIFO order.
-     * @param task - task to be scheduled.
+     * @param task task to be scheduled.
      */
     void schedule(Task task);
     /**

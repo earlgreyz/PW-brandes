@@ -45,10 +45,10 @@ namespace Brandes {
     }
 
     void Graph::load(std::istream &istream) {
-        IdentifierType in, out;
-        while (istream >> in >> out) {
-            std::shared_ptr<Brandes::Node> node = get_node(in);
-            std::weak_ptr<Brandes::Node> neighbour = get_node(out);
+        IdentifierType from, to;
+        while (istream >> from >> to) {
+            std::shared_ptr<Brandes::Node> node = get_node(from);
+            std::weak_ptr<Brandes::Node> neighbour = get_node(to);
             node->neighbours.push_back(neighbour);
         }
         reorder();

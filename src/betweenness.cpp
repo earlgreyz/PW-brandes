@@ -16,8 +16,8 @@ namespace {
         std::stack<std::shared_ptr<Brandes::Node>> stack;
         std::queue<std::shared_ptr<Brandes::Node>> queue;
 
-        std::vector<std::vector<size_t>> predecessors;
-        std::vector<size_t> shortest_paths;
+        std::vector<std::vector<std::size_t>> predecessors;
+        std::vector<std::size_t> shortest_paths;
         std::vector<long long> distance;
         std::vector<Brandes::WeightType> delta;
         mutable std::mutex mutex;
@@ -32,15 +32,15 @@ namespace {
     };
 
     BrandesScope::BrandesScope(Brandes::Graph &graph) : graph(graph) {
-        size_t graph_size = graph.get_size();
-        predecessors = std::vector<std::vector<size_t>>(graph_size);
-        shortest_paths = std::vector<size_t>(graph_size);
+        std::size_t graph_size = graph.get_size();
+        predecessors = std::vector<std::vector<std::size_t>>(graph_size);
+        shortest_paths = std::vector<std::size_t>(graph_size);
         distance = std::vector<long long>(graph_size);
         delta = std::vector<Brandes::WeightType >(graph_size);
     }
 
     void BrandesScope::init(const std::shared_ptr<Brandes::Node> &node) {
-        for (size_t i = 0u; i < graph.get_size(); i++) {
+        for (std::size_t i = 0u; i < graph.get_size(); i++) {
             predecessors[i] = {};
             shortest_paths[i] = 0;
             distance[i] = -1;
@@ -58,14 +58,14 @@ namespace {
 
         while (!queue.empty()) {
             std::shared_ptr<Brandes::Node> &current_node = queue.front();
-            size_t order_c = current_node->get_order();
+            std::size_t order_c = current_node->get_order();
 
             queue.pop();
             stack.push(current_node);
 
             for (const auto &neighbour_weak : current_node->get_neighbours()) {
                 auto neighbour = neighbour_weak.lock();
-                size_t order_n = neighbour->get_order();
+                std::size_t order_n = neighbour->get_order();
 
                 if (distance[order_n] < 0) {
                     queue.push(neighbour);
@@ -83,11 +83,11 @@ namespace {
     }
 
     void BrandesScope::apply(const std::shared_ptr<Brandes::Node> &node) {
-        size_t order_n = node->get_order();
+        std::size_t order_n = node->get_order();
 
         while (!stack.empty()) {
             std::shared_ptr<Brandes::Node> &current_node = stack.top();
-            size_t order_c = current_node->get_order();
+            std::size_t order_c = current_node->get_order();
 
             stack.pop();
 
@@ -106,7 +106,7 @@ namespace {
 }
 
 namespace Brandes {
-    void betweenness(const size_t &threads_count, Graph &graph) {
+    void betweenness(const std::size_t &threads_count, Graph &graph) {
         graph.clear_weights();
         Scheduler<BrandesScope, Graph, std::shared_ptr<Node>>
                 scheduler{ threads_count, std::reference_wrapper<Graph>(graph) };

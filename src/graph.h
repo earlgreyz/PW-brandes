@@ -50,7 +50,7 @@ namespace Brandes {
     public:
         /**
          * Constructs a new node with given id.
-         * @param id - new node id.
+         * @param id new node id.
          */
         Node(IdentifierType id);
         /**
@@ -66,7 +66,7 @@ namespace Brandes {
         /**
          * Increases weight of the node by given amount.
          * This function is thread safe.
-         * @param weight - amount to increase.
+         * @param weight amount to increase weight by
          */
         void increase_weight(WeightType weight);
     };
@@ -83,33 +83,44 @@ namespace Brandes {
         /**
          * Creates single Node.
          * Newly created node is added to the nodes map.
-         * @param id - id of the newly created node
+         * @param id id of the newly created node
          * @return pointer to the new node
          */
         std::shared_ptr<Node> create_node(IdentifierType id);
         /**
          * Gets node from nodes map.
-         * If node with given id does not exist create_node with given id
+         * If node with given id does not exist `create_node`
          * is called and the newly created node is returned.
-         * @param id - id of the node
+         * @param id id of the node
          * @return pointer to the node with given id
          */
         std::shared_ptr<Node> get_node(IdentifierType id);
         /**
          * Reorders nodes.
-         * Iterates through nodes map and assigns unique id
-         * from 0 to nodes.size() -1 for every node.
+         * Iterates through nodes map assigning each node with unique id
+         * from `0` to `nodes.size() - 1`.
          */
         void reorder() noexcept;
     public:
         /**
          * Loads graph representation.
-         * @param istream - stream to load from.
+         * Input data in the stream should be of the given format
+         * ```
+         * <vertex_from> <vertex_to>
+         * ```
+         * meaning that directed edge from `<vertex_from>` to `<vertex_to>` exists.
+         * The `<vertex_from>` and `<vertex_to>` must be of the IdentifierType type.
+         * @param istream stream from which to load data
          */
         void load(std::istream &istream);
         /**
          * Saves graph weights.
-         * @param ostream - stream to save to.
+         * Each line in output is of the given format
+         * ```
+         * <vertex_id> <vertex_weight>
+         * ```
+         * Vertices are printed by ascending order.
+         * @param ostream stream to output data to
          */
         void save(std::ostream &ostream) const;
         /**
