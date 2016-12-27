@@ -49,7 +49,8 @@ int main(int argc, char *argv[]) {
         std::ifstream input_file(input_filename);
         graph.load(input_file);
         Brandes::betweenness(threads_count, graph);
-        graph.save(std::cout);
+        std::ofstream output_file(output_filename);
+        graph.save(output_file);
     } catch (...) {
         return EXIT_FAILURE;
     }
