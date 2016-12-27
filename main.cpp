@@ -11,8 +11,9 @@ size_t threads_count;
 std::string input_filename;
 std::string output_filename;
 
-void usage() {
-    std::cerr << "Usage: " << std::endl;
+void usage(char * const filename) {
+    std::cerr << "Usage: " << filename << " THREADS_COUNT"
+              << " INPUT_FILE" << " OUTPUT_FILE" << std::endl;
 }
 
 template <typename T>
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
         parse_args(argc, argv);
     } catch (std::invalid_argument e) {
         std::cerr << e.what() << std::endl;
-        usage();
+        usage(argv[0]);
         return EXIT_FAILURE;
     }
 
