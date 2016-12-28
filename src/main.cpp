@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         Brandes::Graph graph;
         std::ifstream input_file(input_filename);
         graph.load(input_file);
-        Brandes::betweenness(threads_count, graph);
+        Brandes::calculate_weights(threads_count, graph);
         std::ofstream output_file(output_filename);
         graph.save(output_file);
     } catch (...) {
