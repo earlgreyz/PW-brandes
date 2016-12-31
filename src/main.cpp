@@ -31,9 +31,12 @@ void parse_args(const int &argc,  char * const argv[]) {
         throw std::invalid_argument("Too many arguments");
     }
 
-    parse_argument<size_t>(argv[1], threads_count, "Threads count must be an unsigned integer");
-    parse_argument<std::string>(argv[2], input_filename,  "Invalid input filename");
-    parse_argument<std::string>(argv[3], output_filename, "Invalid output filename");
+    parse_argument<size_t>(argv[1], threads_count,
+                           "Threads count must be an unsigned integer");
+    parse_argument<std::string>(argv[2], input_filename,
+                                "Invalid input filename");
+    parse_argument<std::string>(argv[3], output_filename,
+                                "Invalid output filename");
 }
 
 int main(int argc, char *argv[]) {
