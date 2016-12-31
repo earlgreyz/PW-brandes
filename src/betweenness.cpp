@@ -66,7 +66,7 @@ namespace {
          * Calculates betweenness for the graph starting with given node
          * @param node starting node
          */
-        void execute(const std::shared_ptr<Brandes::Node> &node);
+        void execute(std::shared_ptr<Brandes::Node> node);
     };
 
     BrandesScope::BrandesScope(Brandes::Graph &graph) : graph(graph) {
@@ -90,11 +90,13 @@ namespace {
         queue.push(node);
     }
 
-    void BrandesScope::execute(const std::shared_ptr<Brandes::Node> &node) {
+    void BrandesScope::execute(std::shared_ptr<Brandes::Node> node) {
         init(node);
 
         while (!queue.empty()) {
-            std::shared_ptr<Brandes::Node> &current_node = queue.front();
+            std::weak_ptr<Brandes::Node> current_node_weak = queue.front();
+            auto current_node = current_node_weak.lock();
+
             std::size_t order_c = current_node->get_order();
 
             queue.pop();
