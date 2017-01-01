@@ -82,8 +82,8 @@ namespace Synchronization {
     };
 
     template <typename Scope, typename ...ScopeArgs>
-    void Scheduler<Scope, ScopeArgs...>::worker(
-            Scheduler<Scope, ScopeArgs...> *scheduler, ScopeArgs... args) {
+    void Scheduler<Scope, ScopeArgs...>
+    ::worker(Scheduler<Scope, ScopeArgs...> *scheduler, ScopeArgs... args) {
         Scope scope{ args... };
         while (true) {
             std::unique_lock<std::mutex> lock{ scheduler->mutex };
@@ -108,8 +108,9 @@ namespace Synchronization {
     }
 
     template <typename Scope, typename ...ScopeArgs>
-    Scheduler<Scope, ScopeArgs...>::Scheduler(
-            std::size_t threads_count, ScopeArgs ...args) {
+    Scheduler<Scope, ScopeArgs...>
+    ::Scheduler(std::size_t threads_count, ScopeArgs ...args)
+            : terminating(false) {
         threads.reserve(threads_count);
         for (std::size_t i = 0u; i < threads_count; i++) {
             threads.emplace_back(worker, this, args...);
@@ -131,7 +132,8 @@ namespace Synchronization {
     }
 
     template <typename Scope, typename ...ScopeArgs>
-    void Scheduler<Scope, ScopeArgs...>::schedule(typename Scope::ScopeTask task) {
+    void Scheduler<Scope, ScopeArgs...>
+    ::schedule(typename Scope::ScopeTask task) {
         std::lock_guard<std::mutex> lock{ mutex };
         tasks.push(task);
         workers_condition.notify_one();
