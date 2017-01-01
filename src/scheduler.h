@@ -15,17 +15,10 @@ namespace Synchronization {
      * scheduledTask.
      * @tparam Scope class of the Scope
      * @tparam ScopeArgs argument of the Scope constructor
-     * (up until to c++17 it cannot be deduced from context)
-     * @tparam Task type to be scheduled (argument of the Scope::execute function)
      */
-    template <typename Scope, typename ScopeArgs, typename Task>
+    template <typename Scope, typename ...ScopeArgs>
     class Scheduler {
     private:
-        /**
-         * Argument to be passed Scope instances constructor
-         */
-        ScopeArgs scope_args;
-
         /**
          * Marks if scheduler is about to finish.
          */
@@ -50,20 +43,22 @@ namespace Synchronization {
         /**
          * Queue of scheduled tasks.
          */
-        std::queue<Task> tasks;
+        std::queue<typename Scope::ScopeTask> tasks;
 
         /**
          * Function performed by each thread.
          * @param scheduler - pointer to `this`
+         * @param args - arguments to be passed to Scope constructor
          */
-        static void worker(Scheduler<Scope, ScopeArgs, Task>* scheduler);
+        static void worker(Scheduler<Scope, ScopeArgs...>* scheduler,
+                           ScopeArgs... args);
     public:
         /**
          * Creates new scheduler.
          * @param threads_count number of threads to be used by scheduler.
-         * @param args argument to be passed to Scope instances
+         * @param args arguments to be passed to Scope constructor
          */
-        Scheduler(std::size_t threads_count, ScopeArgs args);
+        Scheduler(std::size_t threads_count, ScopeArgs ...args);
         ~Scheduler();
 
         // Non copyable
@@ -78,7 +73,7 @@ namespace Synchronization {
          * Scheduled task will be performed in FIFO order.
          * @param task task to be scheduled.
          */
-        void schedule(Task task);
+        void schedule(typename Scope::ScopeTask task);
         /**
          * Stops execution of thread that performed join until all scheduled
          * tasks are finished.
@@ -86,10 +81,10 @@ namespace Synchronization {
         void join();
     };
 
-    template <typename Scope, typename ScopeArgs, typename Task>
-    void Scheduler<Scope, ScopeArgs, Task>::worker(
-            Scheduler<Scope, ScopeArgs, Task> *scheduler) {
-        Scope scope{ scheduler->scope_args };
+    template <typename Scope, typename ...ScopeArgs>
+    void Scheduler<Scope, ScopeArgs...>::worker(
+            Scheduler<Scope, ScopeArgs...> *scheduler, ScopeArgs... args) {
+        Scope scope{ args... };
         while (true) {
             std::unique_lock<std::mutex> lock{ scheduler->mutex };
 
@@ -112,17 +107,17 @@ namespace Synchronization {
         }
     }
 
-    template <typename Scope, typename ScopeArgs, typename Task>
-    Scheduler<Scope, ScopeArgs, Task>::Scheduler(
-            std::size_t threads_count, ScopeArgs args) : scope_args(args) {
+    template <typename Scope, typename ...ScopeArgs>
+    Scheduler<Scope, ScopeArgs...>::Scheduler(
+            std::size_t threads_count, ScopeArgs ...args) {
         threads.reserve(threads_count);
         for (std::size_t i = 0u; i < threads_count; i++) {
-            threads.emplace_back(worker, this);
+            threads.emplace_back(worker, this, args...);
         }
     }
 
-    template <typename Scope, typename ScopeArgs, typename Task>
-    Scheduler<Scope, ScopeArgs, Task>::~Scheduler() {
+    template <typename Scope, typename ...ScopeArgs>
+    Scheduler<Scope, ScopeArgs...>::~Scheduler() {
         terminating = true;
         workers_condition.notify_all();
 
@@ -135,15 +130,15 @@ namespace Synchronization {
         wait_condition.notify_all();
     }
 
-    template <typename Scope, typename ScopeArgs, typename Task>
-    void Scheduler<Scope, ScopeArgs, Task>::schedule(Task task) {
+    template <typename Scope, typename ...ScopeArgs>
+    void Scheduler<Scope, ScopeArgs...>::schedule(typename Scope::ScopeTask task) {
         std::lock_guard<std::mutex> lock{ mutex };
         tasks.push(task);
         workers_condition.notify_one();
     }
 
-    template <typename Scope, typename ScopeArgs, typename Task>
-    void Scheduler<Scope, ScopeArgs, Task>::join() {
+    template <typename Scope, typename ...ScopeArgs>
+    void Scheduler<Scope, ScopeArgs...>::join() {
         std::unique_lock<std::mutex> lock{ mutex };
         if (!tasks.empty()) {
             wait_condition.wait(lock, [&] {

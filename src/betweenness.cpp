@@ -57,6 +57,7 @@ namespace {
          */
         void apply(const std::shared_ptr<Brandes::Node> &node);
     public:
+        using ScopeTask = std::shared_ptr<Brandes::Node>;
         /**
          * Constructs new BrandesScope
          * @param graph graph for which to calculate betweenness
@@ -66,7 +67,7 @@ namespace {
          * Calculates betweenness for the graph starting with given node
          * @param node starting node
          */
-        void execute(std::shared_ptr<Brandes::Node> node);
+        void execute(ScopeTask node);
     };
 
     BrandesScope::BrandesScope(Brandes::Graph &graph) : graph(graph) {
@@ -90,7 +91,7 @@ namespace {
         queue.push(node);
     }
 
-    void BrandesScope::execute(std::shared_ptr<Brandes::Node> node) {
+    void BrandesScope::execute(ScopeTask node) {
         init(node);
 
         while (!queue.empty()) {
@@ -147,7 +148,7 @@ namespace {
 namespace Brandes {
     void calculate_weights(const std::size_t &threads_count, Graph &graph) {
         graph.clear_weights();
-        Synchronization::Scheduler<BrandesScope, Graph, std::shared_ptr<Node>>
+        Synchronization::Scheduler<BrandesScope, Graph>
                 scheduler{ threads_count, std::reference_wrapper<Graph>(graph) };
         for (const auto &node : graph.get_nodes()) {
             scheduler.schedule(node.second);
