@@ -12,12 +12,15 @@
 
 namespace Synchronization {
     /**
-     * Scheduler Scope interface.
+     * Virtual interface representing Scheduler scope.
      * @tparam T type of tasks to execute
      */
     template <typename T>
     class Scope {
     public:
+        /**
+         * Represents task type to execute.
+         */
         using Task = T;
         /**
          * Executes the given task.
@@ -67,14 +70,14 @@ namespace Synchronization {
         /**
          * Function performed by each thread.
          * @param scheduler pointer to `this`
-         * @param args arguments to be passed to Scope constructor
+         * @param args arguments for `S` constructor
          */
         static void worker(Scheduler<S, Args...> *scheduler, Args ...args);
     public:
         /**
          * Creates new scheduler.
          * @param threads_count number of threads to be used by scheduler.
-         * @param args arguments to be passed to Scope constructor
+         * @param args arguments for `S` constructor
          */
         Scheduler(std::size_t threads_count, Args ...args);
         ~Scheduler();
