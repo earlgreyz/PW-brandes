@@ -21,8 +21,7 @@ namespace Brandes {
     using WeightType = double;
 
     /**
-     * Represents single node in a graph.
-     * Friend class Graph to allow appending neighbours and reordering.
+     * @brief Represents single node in a graph.
      */
     class Node {
         friend class Graph;
@@ -72,7 +71,7 @@ namespace Brandes {
     };
 
     /**
-     * Represents directed graph with weighted nodes.
+     * @brief Represents directed graph with weighted nodes.
      */
     class Graph {
     private:

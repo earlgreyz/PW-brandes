@@ -12,7 +12,7 @@
 
 namespace Synchronization {
     /**
-     * Virtual interface representing Scheduler scope.
+     * @brief Virtual interface representing Scheduler scope.
      * @tparam T type of tasks to execute
      */
     template <typename T>
@@ -30,7 +30,7 @@ namespace Synchronization {
     };
 
     /**
-     * Creates Scopes instances and performs execute function for every
+     * @brief Creates Scopes instances and performs execute function for every
      * scheduledTask.
      * @tparam S subclass of the Scope
      * @tparam Args arguments for S constructor

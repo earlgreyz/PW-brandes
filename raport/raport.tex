@@ -1,6 +1,11 @@
 \documentclass{article}
 \usepackage{polski}
 \usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    linkcolor=[rgb]{.0 .152 .645}
+}
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage[edges]{forest}
@@ -67,9 +72,15 @@
         [brandes
           [src
             [betweennes.h/.cpp \textrm{-- zawiera implementację algorytmu Brandesa}, file]
-            [graph.h/.cpp \textrm{-- klasy \texttt{Brandes::Node} oraz \texttt{Brandes::Graph}}, file]
-            [scheduler.h \textrm{-- klasy \texttt{Synchronization::Scope} oraz \texttt{Synchronization::Scheduler}}, file]
-            [main.cpp \textrm{-- odpowiedzialny za wykonanie programu na podstawie argumentów}, file]
+            [graph.h/.cpp \textrm{--
+              klasy \hyperref[class:brandes__node]{\texttt{Brandes::Node}}
+              oraz \hyperref[class:brandes__graph]{\texttt{Brandes::Graph}}}
+            , file]
+            [scheduler.h \textrm{--
+              klasy \hyperref[class:synchronization__scope]{\texttt{Synchronization::Scope}}
+              oraz \hyperref[class:synchronization__scheduler]{\texttt{Synchronization::Scheduler}}}
+            , file]
+            [main.cpp \textrm{-- odpowiedzialny za wykonanie programu}, file]
           ]
         ]
       \end{forest}
@@ -78,6 +89,14 @@
     \end{figure}
 
     \subsection{Podział na klasy}
+    \label{class:brandes__node}
+    Brandes::Node
+    \label{class:brandes__graph}
+    Brandes::Graph
+    \label{class:synchronization__scope}
+    Synchronization::Scope
+    \label{class:synchronization__scheduler}
+    Synchronization::Scheduler
 
     \subsection{Dokumentacja techniczna}
     Do wygenerowania dokumentacji wymagana jest instalacja pakietu Doxygen w wersji $\geq$ 1.8.8.
