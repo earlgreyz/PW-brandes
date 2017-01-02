@@ -91,7 +91,7 @@ namespace {
         queue.push(node);
     }
 
-    void BrandesScope::execute(ScopeTask node) {
+    void BrandesScope::execute(Task node) {
         init(node);
 
         while (!queue.empty()) {
@@ -148,7 +148,7 @@ namespace {
 namespace Brandes {
     void calculate_weights(const std::size_t &threads_count, Graph &graph) {
         graph.clear_weights();
-        Synchronization::Scheduler<BrandesScope>
+        Synchronization::Scheduler<BrandesScope, Graph>
                 scheduler{ threads_count, std::reference_wrapper<Graph>(graph) };
         for (const auto &node : graph.get_nodes()) {
             scheduler.schedule(node.second);

@@ -18,7 +18,7 @@ namespace Synchronization {
     template <typename T>
     class Scope {
     public:
-        using Task = typename T;
+        using Task = T;
         /**
          * Executes the given task.
          * @param task task to execute
@@ -30,10 +30,12 @@ namespace Synchronization {
      * Creates Scopes instances and performs execute function for every
      * scheduledTask.
      * @tparam S subclass of the Scope
+     * @tparam Args arguments for S constructor
      */
-    template <typename S>
+    template <typename S, typename ...Args>
     class Scheduler {
-        static_assert(std::is_base_of<Scope, S>::value, "Invalid Scope!");
+        static_assert(std::is_base_of<Scope<typename S::Task>, S>::value,
+                      "Given Scope class must inherit from Scope base class!");
     private:
         using Task = typename S::Task;
         /**
@@ -67,15 +69,13 @@ namespace Synchronization {
          * @param scheduler pointer to `this`
          * @param args arguments to be passed to Scope constructor
          */
-        template <typename ...Args>
-        static void worker(Scheduler<S, Args...>* scheduler, Args... args);
+        static void worker(Scheduler<S, Args...> *scheduler, Args ...args);
     public:
         /**
          * Creates new scheduler.
          * @param threads_count number of threads to be used by scheduler.
          * @param args arguments to be passed to Scope constructor
          */
-        template <typename ...Args>
         Scheduler(std::size_t threads_count, Args ...args);
         ~Scheduler();
 
@@ -100,7 +100,7 @@ namespace Synchronization {
     };
 
     template <typename S, typename ...Args>
-    void Scheduler<S>::worker(Scheduler<S> *scheduler, Args... args) {
+    void Scheduler<S, Args...>::worker(Scheduler<S, Args...> *scheduler, Args ...args) {
         S scope{ args... };
         while (true) {
             std::unique_lock<std::mutex> lock{ scheduler->mutex };
@@ -125,7 +125,7 @@ namespace Synchronization {
     }
 
     template <typename S, typename ...Args>
-    Scheduler<S>::Scheduler(std::size_t threads_count, Args ...args)
+    Scheduler<S, Args...>::Scheduler(std::size_t threads_count, Args ...args)
             : terminating(false) {
         threads.reserve(threads_count);
         for (std::size_t i = 0u; i < threads_count; i++) {
@@ -133,8 +133,8 @@ namespace Synchronization {
         }
     }
 
-    template <typename S>
-    Scheduler<S>::~Scheduler() {
+    template <typename S, typename ...Args>
+    Scheduler<S, Args...>::~Scheduler() {
         terminating = true;
         workers_condition.notify_all();
 
@@ -147,15 +147,15 @@ namespace Synchronization {
         wait_condition.notify_all();
     }
 
-    template <typename S>
-    void Scheduler<S>::schedule(Task task) {
+    template <typename S, typename ...Args>
+    void Scheduler<S, Args...>::schedule(Task task) {
         std::lock_guard<std::mutex> lock{ mutex };
         tasks.push(task);
         workers_condition.notify_one();
     }
 
-    template <typename S>
-    void Scheduler<S>::join() {
+    template <typename S, typename ...Args>
+    void Scheduler<S, Args...>::join() {
         std::unique_lock<std::mutex> lock{ mutex };
         if (!tasks.empty()) {
             wait_condition.wait(lock, [&] {
