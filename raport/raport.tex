@@ -1,0 +1,97 @@
+\documentclass{article}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage[edges]{forest}
+\definecolor{folderbg}{RGB}{124,166,198}
+\definecolor{folderborder}{RGB}{110,144,169}
+\newlength\Size
+\setlength\Size{4pt}
+\tikzset{%
+  folder/.pic={%
+    \filldraw [draw=folderborder, top color=folderbg!50, bottom color=folderbg] (-1.05*\Size,0.2\Size+5pt) rectangle ++(.75*\Size,-0.2\Size-5pt);
+    \filldraw [draw=folderborder, top color=folderbg!50, bottom color=folderbg] (-1.15*\Size,-\Size) rectangle (1.15*\Size,\Size);
+  },
+  file/.pic={%
+    \filldraw [draw=folderborder, top color=folderbg!5, bottom color=folderbg!10] (-\Size,.4*\Size+5pt) coordinate (a) |- (\Size,-1.2*\Size) coordinate (b) -- ++(0,1.6*\Size) coordinate (c) -- ++(-5pt,5pt) coordinate (d) -- cycle (d) |- (c) ;
+  },
+}
+\forestset{%
+  declare autowrapped toks={pic me}{},
+  pic dir tree/.style={%
+    for tree={%
+      folder,
+      font=\ttfamily,
+      grow'=0,
+    },
+    before typesetting nodes={%
+      for tree={%
+        edge label+/.option={pic me},
+      },
+    },
+  },
+  pic me set/.code n args=2{%
+    \forestset{%
+      #1/.style={%
+        inner xsep=2\Size,
+        pic me={pic {#2}},
+      }
+    }
+  },
+  pic me set={directory}{folder},
+  pic me set={file}{file},
+}
+
+\title{Współbieżny algorytm Brandesa}
+\author{Mikołaj Walczak}
+
+\begin{document}
+  \pagenumbering{gobble}
+  \maketitle
+
+  \newpage
+  \pagenumbering{arabic}
+  \section{Implementacja}
+  Dokładny opis implementacji można znaleźć w dokumentacji technicznej.
+  \subsection{Dokumentacja techniczna}
+  Do wygenerowania dokumentacji wymagana jest instalacja pakietu Doxygen w wersji $\geq$ 1.8.8.
+  Wykonanie poniższych instrukcji spowoduje wygenerowanie dokumentacji w katalogu \texttt{build/doc}.
+  \begin{verbatim}
+    $ cd brandes
+    $ mkdir build && cd $_
+    $ make doc
+  \end{verbatim}
+  \begin{forest}
+    pic dir tree,
+  where level=0{}{% folder icons by default; override using file for file icons
+    directory,
+  },
+    [brandes
+      [build
+        [doc
+          [html \textrm{dokumentacja w wersji HTML}]
+          [latex \textrm{dokumentacja w wersji \LaTeX}]
+        ]
+        [Doxyfile, file]
+        [Makefile, file]
+      ]
+      [CMakeLists.txt \textrm{instrukcje budowy dokumentacji}, file]
+      [Doxyfile.in \textrm{konfiguracja dokumentacji}, file]
+      [doxygen \textrm{pliki stylu dokumentacji}]
+      [src \textrm{kod źródłowy}]
+    ]
+  \end{forest}
+
+
+  \section{Optymalizacje}
+    \begin{itemize}[noitemsep]
+    \item Dostęp w czasie $\mathcal{O}(1)$ do elementów w tablicach dzięki preprocessingowi
+    w czasie $\mathcal{O}(V)$.
+    \item Uwspółbieżnienie kroku dla każdego wierzchołka
+    \item Zachowanie liniowej pamięci dzięki użyciu Schedulera i BrandesScope
+    \end{itemize}
+  \newpage
+  \section{Statystyki}
+
+\end{document}
