@@ -49,39 +49,62 @@
 \begin{document}
   \pagenumbering{gobble}
   \maketitle
-
   \newpage
+
+  \tableofcontents
+  \listoffigures
+  \newpage
+
   \pagenumbering{arabic}
   \section{Implementacja}
-  Dokładny opis implementacji można znaleźć w dokumentacji technicznej.
-  \subsection{Dokumentacja techniczna}
-  Do wygenerowania dokumentacji wymagana jest instalacja pakietu Doxygen w wersji $\geq$ 1.8.8.
-  Wykonanie poniższych instrukcji spowoduje wygenerowanie dokumentacji w katalogu \texttt{build/doc}.
-  \begin{verbatim}
-    $ cd brandes
-    $ mkdir build && cd $_
-    $ make doc
-  \end{verbatim}
-  \begin{forest}
-    pic dir tree,
-  where level=0{}{% folder icons by default; override using file for file icons
-    directory,
-  },
-    [brandes
-      [build
-        [doc
-          [html \textrm{dokumentacja w wersji HTML}]
-          [latex \textrm{dokumentacja w wersji \LaTeX}]
+    \subsection{Podział na pliki}
+    Implementacja została podzielona względem odpowiedzialności za poszczególne części
+    programu na następujące pliki (Rysunek \ref{fig:files}).
+
+    \begin{figure}[h]
+      \begin{forest}
+        pic dir tree, where level=0{}{directory,},
+        [brandes
+          [src
+            [betweennes.h/.cpp \textrm{-- zawiera implementację algorytmu Brandesa}, file]
+            [graph.h/.cpp \textrm{-- klasy \texttt{Brandes::Node} oraz \texttt{Brandes::Graph}}, file]
+            [scheduler.h \textrm{-- klasy \texttt{Synchronization::Scope} oraz \texttt{Synchronization::Scheduler}}, file]
+            [main.cpp \textrm{-- odpowiedzialny za wykonanie programu na podstawie argumentów}, file]
+          ]
         ]
-        [Doxyfile, file]
-        [Makefile, file]
+      \end{forest}
+      \caption{Podział na pliki}
+      \label{fig:files}
+    \end{figure}
+
+    \subsection{Podział na klasy}
+
+    \subsection{Dokumentacja techniczna}
+    Do wygenerowania dokumentacji wymagana jest instalacja pakietu Doxygen w wersji $\geq$ 1.8.8.
+    Wykonanie poniższych instrukcji spowoduje wygenerowanie dokumentacji w katalogu \texttt{build/doc}.
+    \begin{verbatim}
+      $ cd brandes
+      $ mkdir build && cd $_
+      $ make doc
+    \end{verbatim}
+
+    \begin{forest}
+      pic dir tree, where level=0{}{directory,},
+      [brandes
+        [build
+          [doc
+            [html \textrm{-- dokumentacja w wersji HTML}]
+            [latex \textrm{-- dokumentacja w wersji \LaTeX}]
+          ]
+          [Doxyfile, file]
+          [Makefile, file]
+        ]
+        [CMakeLists.txt \textrm{-- instrukcje budowy dokumentacji}, file]
+        [Doxyfile.in \textrm{-- konfiguracja dokumentacji}, file]
+        [doxygen \textrm{-- pliki stylu dokumentacji}]
+        [src \textrm{-- kod źródłowy}]
       ]
-      [CMakeLists.txt \textrm{instrukcje budowy dokumentacji}, file]
-      [Doxyfile.in \textrm{konfiguracja dokumentacji}, file]
-      [doxygen \textrm{pliki stylu dokumentacji}]
-      [src \textrm{kod źródłowy}]
-    ]
-  \end{forest}
+    \end{forest}
 
 
   \section{Optymalizacje}
