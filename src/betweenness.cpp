@@ -148,7 +148,7 @@ namespace {
 namespace Brandes {
     void calculate_weights(const std::size_t &threads_count, Graph &graph) {
         graph.clear_weights();
-        Synchronization::Scheduler<BrandesScope, Graph>
+        Synchronization::Scheduler<BrandesScope>
                 scheduler{ threads_count, std::reference_wrapper<Graph>(graph) };
         for (const auto &node : graph.get_nodes()) {
             scheduler.schedule(node.second);
