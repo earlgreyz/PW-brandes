@@ -62,6 +62,9 @@
 
   \pagenumbering{arabic}
   \section{Implementacja}
+    Poniższy rozdział zawiera jedynie krótki opis implementacji. Szczegóły
+    dotyczące klas i metod przez nie udostępnianych można znaleźć w
+    \hyperref[documentation]{dokumentacji technicznej}.
     \label{implementation}
     \subsection{Podział na pliki}
       \label{files}
@@ -94,8 +97,8 @@
       \end{figure}
 
     \subsection{Podział na klasy}
-      Podział na klasy przedstawia poniższy obrazek (\hyperref[fig:classes]
-      {Rysunek \ref*{fig:classes}}).
+      Podział na klasy przedstawiony jest na \hyperref[fig:classes]
+      {Rysunku \ref*{fig:classes}}.
       \label{classes}
       \begin{figure}[h]
         \label{fig:classes}
@@ -162,7 +165,7 @@
       \texttt{std::istream} oraz zapisanie wierzchołków wraz z wagami do strumienia
       \texttt{std::ostream}.
 
-      \subsubsection{Brandes::calculate\_weights()}
+      \subsubsection{Brandes::calculate\_weights}
       \label{func:brandes__calculate_weights}
       Implementacja algorytmu Brandesa. Liczy wagi wierzchołków dla danego
       \hyperref[class:brandes__graph]{\texttt{grafu}} tworząc obiekt klasy
@@ -175,16 +178,25 @@
 
       \subsubsection{Synchronization::Scope}
       \label{class:synchronization__scope}
+      Klasa abstrakcyjna (właść. interface), z którego musi dziedziczyć klasa
+      środowiska obliczeniowego \hyperref[class:synchronization__scheduler]
+      {\texttt{Scheduler}}'a. Dla danego zadania wykonuje wirtualną funkcję
+      \texttt{execute(task)}.
 
       \subsubsection{Synchronization::Scheduler}
       \label{class:synchronization__scheduler}
+      Główny mechanizm synchronizujący. Tworzy pulę wątków a w każdym z nich
+      instancję podanej klasy \hyperref[class:synchronization_scope]{\texttt{Scope}}.
+      Zleca wątkom wykonywanie funkcji \texttt{execute(task)} dla każdego otrzymanego
+      zadania.
 
     \subsection{Dokumentacja techniczna}
       \label{documentation}
-      Do wygenerowania dokumentacji wymagana jest instalacja pakietu Doxygen w wersji $\geq$ 1.8.8.
-      Wykonanie poniższych instrukcji spowoduje wygenerowanie dokumentacji w katalogu \texttt{build/doc}.
+      Do wygenerowania dokumentacji wymagana jest pakiet Doxygen
+      w wersji $\geq$ 1.8.8. Wykonanie poniższych instrukcji w katalogu
+      projektu spowoduje wygenerowanie dokumentacji w folderach jak na
+      \hyperref[fig:documentation]{Rysunku \ref*{fig:documentation}}.
       \begin{verbatim}
-        $ cd brandes
         $ mkdir build && cd $_
         $ cmake ..
         $ make doc
@@ -204,7 +216,7 @@
             ]
             [CMakeLists.txt \textrm{-- instrukcje budowy dokumentacji}, file]
             [Doxyfile.in \textrm{-- konfiguracja dokumentacji}, file]
-            [doxygen \textrm{-- pliki stylu dokumentacji}]
+            [doxygen \textrm{-- pliki stylu dokumentacji HTML}]
             [src \textrm{-- kod źródłowy}]
           ]
         \end{forest}
@@ -213,8 +225,8 @@
 
   \section{Optymalizacje}
     \begin{itemize}[noitemsep]
-    \item Dostęp w czasie $\mathcal{O}(1)$ do elementów w tablicach dzięki preprocessingowi
-    w czasie $\mathcal{O}(V)$.
+    \item Dostęp w czasie $\mathcal{O}(1)$ do elementów w tablicach dzięki
+    preprocessingowi w czasie $\mathcal{O}(V)$.
     \item Uwspółbieżnienie kroku dla każdego wierzchołka
     \item Zachowanie liniowej pamięci dzięki użyciu Schedulera i BrandesScope
     \end{itemize}

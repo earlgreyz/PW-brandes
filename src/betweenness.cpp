@@ -67,7 +67,7 @@ namespace {
          * Calculates betweenness for the graph starting with given node
          * @param node starting node
          */
-        void execute(std::shared_ptr<Brandes::Node> node);
+        void execute(std::shared_ptr<Brandes::Node> node) override;
     };
 
     BrandesScope::BrandesScope(Brandes::Graph &graph) : graph(graph) {
