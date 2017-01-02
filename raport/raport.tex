@@ -62,69 +62,154 @@
 
   \pagenumbering{arabic}
   \section{Implementacja}
+    \label{implementation}
     \subsection{Podział na pliki}
-    Implementacja została podzielona względem odpowiedzialności za poszczególne części
-    programu na następujące pliki (Rysunek \ref{fig:files}).
+      \label{files}
+      Implementacja została podzielona względem odpowiedzialności za poszczególne
+      części programu na pliki jak na obrazku poniżej (\hyperref[fig:files]
+      {Rysunek \ref*{fig:files}}).
 
-    \begin{figure}[h]
-      \begin{forest}
-        pic dir tree, where level=0{}{directory,},
-        [brandes
-          [src
-            [betweennes.h/.cpp \textrm{-- zawiera implementację algorytmu Brandesa}, file]
-            [graph.h/.cpp \textrm{--
-              klasy \hyperref[class:brandes__node]{\texttt{Brandes::Node}}
-              oraz \hyperref[class:brandes__graph]{\texttt{Brandes::Graph}}}
-            , file]
-            [scheduler.h \textrm{--
-              klasy \hyperref[class:synchronization__scope]{\texttt{Synchronization::Scope}}
-              oraz \hyperref[class:synchronization__scheduler]{\texttt{Synchronization::Scheduler}}}
-            , file]
-            [main.cpp \textrm{-- odpowiedzialny za wykonanie programu}, file]
+      \begin{figure}[h]
+        \label{fig:files}
+        \begin{forest}
+          pic dir tree, where level=0{}{directory,},
+          [brandes
+            [src
+              [betweennes.h/.cpp \textrm{-- zawiera implementację algorytmu
+                Brandesa}, file]
+              [graph.h/.cpp \textrm{--
+                klasy \hyperref[class:brandes__node]{\texttt{Node}}
+                oraz \hyperref[class:brandes__graph]{\texttt{Graph}}}
+              , file]
+              [scheduler.h \textrm{--
+                klasy \hyperref[class:synchronization__scope]{\texttt{Scope}}
+                oraz \hyperref[class:synchronization__scheduler]
+                {\texttt{Scheduler}}}
+              , file]
+              [main.cpp \textrm{-- odpowiedzialny za wykonanie programu}, file]
+            ]
           ]
-        ]
-      \end{forest}
-      \caption{Podział na pliki}
-      \label{fig:files}
-    \end{figure}
+        \end{forest}
+        \caption{Podział na pliki}
+      \end{figure}
 
     \subsection{Podział na klasy}
-    \label{class:brandes__node}
-    Brandes::Node
-    \label{class:brandes__graph}
-    Brandes::Graph
-    \label{class:synchronization__scope}
-    Synchronization::Scope
-    \label{class:synchronization__scheduler}
-    Synchronization::Scheduler
+      Podział na klasy przedstawia poniższy obrazek (\hyperref[fig:classes]
+      {Rysunek \ref*{fig:classes}}).
+      \label{classes}
+      \begin{figure}[h]
+        \label{fig:classes}
+        \begin{forest}
+          for tree={
+            font=\ttfamily,
+            grow'=0,
+            child anchor=west,
+            parent anchor=south,
+            anchor=west,
+            calign=first,
+            edge path={
+              \noexpand\path [draw, \forestoption{edge}]
+              (!u.south west) +(7.5pt,0) |- node[fill,inner sep=1.25pt] {} (.child anchor)\forestoption{edge label};
+            },
+            before typesetting nodes={
+              if n=1
+                {insert before={[,phantom]}}
+                {}
+            },
+            fit=band,
+            before computing xy={l=15pt},
+          }
+          [
+            [namespace \texttt{\hyperref[namespace:brandes]{Brandes}}
+              [class \texttt{\hyperref[class:brandes__node]{Node}}]
+              [class \texttt{\hyperref[class:brandes__graph]{Graph}}]
+              [function \texttt{\hyperref[func:brandes__calculate_weights]
+                {calculate\_weights}}]
+            ]
+            [namespace \texttt{\hyperref[namespace:synchronization]
+              {Synchronization}}
+              [class \texttt{\hyperref[class:synchronization__scope]{Scope}}]
+              [class \texttt{\hyperref[class:synchronization__scheduler]
+                {Scheduler}}]
+            ]
+          ]
+        \end{forest}
+        \caption{Podział na klasy}
+      \end{figure}
+
+      \subsubsection{Przestrzenie nazw}
+        \label{namespaces}
+
+        \paragraph{Brandes}
+        \label{namespace:brandes}
+        zawiera klasy i funkcje związane bezpośrednio z implementacją algorytmu
+        Brandesa.
+
+        \paragraph{Synchronization}
+        \label{namespace:synchronization}
+        zawiera klasy i funkcje zapewniające współbieżność wykonywanych obliczeń.
+
+
+      \subsubsection{Brandes::Node}
+      \label{class:brandes__node}
+      Reprezentuje pojedynczy wierzchołek w grafie skierowanym. Pozwala na
+      bezpieczną wielowątkowo zmianę wagi przez operację
+      \texttt{increase\_weight(weight)}.
+
+      \subsubsection{Brandes::Graph}
+      \label{class:brandes__graph}
+      Reprezentuje graf skierowany. Umożliwia wczytanie sktrutury grafu ze strumienia
+      \texttt{std::istream} oraz zapisanie wierzchołków wraz z wagami do strumienia
+      \texttt{std::ostream}.
+
+      \subsubsection{Brandes::calculate\_weights()}
+      \label{func:brandes__calculate_weights}
+      Implementacja algorytmu Brandesa. Liczy wagi wierzchołków dla danego
+      \hyperref[class:brandes__graph]{\texttt{grafu}} tworząc obiekt klasy
+      \hyperref[class:synchronization__scheduler]{\texttt{Scheduler}} z podaną
+      liczbą wątków i zleca mu współbieżne obliczenie wag osobno dla każdego
+      wierzchołka. Dzięki gwarancji bezpieczeństwa metody
+      \texttt{increase\_weight(weight)} klasy \hyperref[class:brandes__node]
+      {\texttt{Node}} obliczenia mogą występować jednocześnie dla różnych
+      wierzchołków.
+
+      \subsubsection{Synchronization::Scope}
+      \label{class:synchronization__scope}
+
+      \subsubsection{Synchronization::Scheduler}
+      \label{class:synchronization__scheduler}
 
     \subsection{Dokumentacja techniczna}
-    Do wygenerowania dokumentacji wymagana jest instalacja pakietu Doxygen w wersji $\geq$ 1.8.8.
-    Wykonanie poniższych instrukcji spowoduje wygenerowanie dokumentacji w katalogu \texttt{build/doc}.
-    \begin{verbatim}
-      $ cd brandes
-      $ mkdir build && cd $_
-      $ make doc
-    \end{verbatim}
-
-    \begin{forest}
-      pic dir tree, where level=0{}{directory,},
-      [brandes
-        [build
-          [doc
-            [html \textrm{-- dokumentacja w wersji HTML}]
-            [latex \textrm{-- dokumentacja w wersji \LaTeX}]
+      \label{documentation}
+      Do wygenerowania dokumentacji wymagana jest instalacja pakietu Doxygen w wersji $\geq$ 1.8.8.
+      Wykonanie poniższych instrukcji spowoduje wygenerowanie dokumentacji w katalogu \texttt{build/doc}.
+      \begin{verbatim}
+        $ cd brandes
+        $ mkdir build && cd $_
+        $ cmake ..
+        $ make doc
+      \end{verbatim}
+      \begin{figure}[h]
+        \label{fig:documentation}
+        \begin{forest}
+          pic dir tree, where level=0{}{directory,},
+          [brandes
+            [build
+              [doc
+                [html \textrm{-- dokumentacja w wersji HTML}]
+                [latex \textrm{-- dokumentacja w wersji \LaTeX}]
+              ]
+              [Doxyfile, file]
+              [Makefile, file]
+            ]
+            [CMakeLists.txt \textrm{-- instrukcje budowy dokumentacji}, file]
+            [Doxyfile.in \textrm{-- konfiguracja dokumentacji}, file]
+            [doxygen \textrm{-- pliki stylu dokumentacji}]
+            [src \textrm{-- kod źródłowy}]
           ]
-          [Doxyfile, file]
-          [Makefile, file]
-        ]
-        [CMakeLists.txt \textrm{-- instrukcje budowy dokumentacji}, file]
-        [Doxyfile.in \textrm{-- konfiguracja dokumentacji}, file]
-        [doxygen \textrm{-- pliki stylu dokumentacji}]
-        [src \textrm{-- kod źródłowy}]
-      ]
-    \end{forest}
-
+        \end{forest}
+        \caption{Generowanie dokumentacji}
+      \end{figure}
 
   \section{Optymalizacje}
     \begin{itemize}[noitemsep]
