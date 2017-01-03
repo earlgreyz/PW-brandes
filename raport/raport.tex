@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{polski}
 \usepackage[utf8]{inputenc}
+\usepackage{csvsimple}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
@@ -203,6 +204,7 @@
         $ cmake ..
         $ make doc
       \end{verbatim}
+      \vspace{-3ex}
       \begin{figure}[h]
         \label{fig:documentation}
         \begin{forest}
@@ -243,7 +245,41 @@
       \item Uwspółbieżnienie kroku dla każdego wierzchołka
       \item Zachowanie liniowej pamięci dzięki użyciu Schedulera i BrandesScope
       \end{itemize}
+
   \newpage
   \section{Statystyki}
+    \subsection{Środowisko pomiarowe}
+    Testy zostały przeprowadzone dla zestawu danych \texttt{wiki-vote-sort.txt}.
+    Wykorzystano komputer wyposażony w 8-rdzeniowy procesor Intel\textsuperscript{
+    \textregistered} Core\texttrademark i7 4700HQ oraz dysk ADATA\textsuperscript{
+    \textregistered} Solid State Drive.
+    \subsection{Przeprowadzenie pomiarów}
+    Dla każdego \texttt{m = 1, 2, \ldots, 8} uruchomiono 100-krotnie program
+    \texttt{brandes} poleceniem
+    \begin{verbatim}
+      $ time ./brandes m wiki-vote-sort.txt wiki.out
+    \end{verbatim}
+    \vspace{-3ex}
+    a wyniki zapisano do plików. Za szukane wartości $p\textsubscript{m}$ przyjęto
+    średnią arytmetyczną z otrzymanych wyników.
+    \begin{table}[h]
+      \centering
+      \label{tab:times}
+      \begin{tabular}{|c|c|c|c|}
+        \hline
+        \bfseries $m$ & \bfseries minimalny czas & \bfseries maksymalny czas & \bfseries $p\textsubscript{m}$ (średni czas)\\
+        \hline
+        1 & 7,321     & 8,464      & 7,65891 \\
+        2 & 4,602     & 5,067      & 4,71832 \\
+        3 & 3,509     & 4,111      & 3,60532 \\
+        4 & 2,819     & 3,207      & 2,88469 \\
+        5 & 2,636     & 3,384      & 2,75075 \\
+        6 & 2,491     & 2,594      & 2,50579 \\
+        7 & 2,359     & 3,162      & 2,42282 \\
+        8 & 2,253     & 2,78       & 2,33299 \\
+        \hline
+        \end{tabular}
+      \caption{Czas wykonania}
+    \end{table}
 
 \end{document}
