@@ -49,16 +49,32 @@
   pic me set={file}{file},
 }
 
-\title{Współbieżny algorytm Brandesa}
+\title{\textbf{Współbieżny algorytm Brandesa}}
 \author{Mikołaj Walczak}
+\date{\vspace{-5ex}}
 
 \begin{document}
+  \newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
   \pagenumbering{gobble}
-  \maketitle
-  \newpage
+  \begin{titlepage}
+    \center
+    \LARGE Uniwersytet Warszawski\\[0.1cm]
+    \Large Wydział Matematyki Informatyki i Mechaniki\\[0.5cm] % Major heading such as course name
+    \large Programowanie Współbieżne\\[5.9cm] % Minor heading such as course title
+    { \huge \bfseries Algorytm Brandesa}\\[0.5cm] % Title of your document
+    \large \emph{Autor:}\\ Mikołaj Walczak \\
+    \vspace{\fill}
+    \begin{minipage}[b]{\textwidth}
+        \centering
+        \large Rok Akademicki 2016/2017
+
+        \vspace{-20mm}
+    \end{minipage}%
+  \end{titlepage}
 
   \tableofcontents
   \listoffigures
+  \listoftables
   \newpage
 
   \pagenumbering{arabic}
@@ -228,7 +244,10 @@
       \end{figure}
 
     \subsection{Optymalizacje}
-      \paragraph{Współbieżność}
+      \paragraph{Współbieżność} Dzięki niezależności obliczeń wpływu pośrednictwa
+      pomiędzy poszczególnymi wierzchołkami możliwe było przeniesieni obliczeń dla
+      każdego wierzchołka do osobnego wątku. Użycie większej ilości wątków znacząco
+      przyspieszyło algorytm (\hyperref[tab:speedup]{Tabela \ref*{tab:speedup}}).
 
       \paragraph{Preprocessing} Ze względu na możliwy niespójny zbiór indeksów
       wierzchołków, w celu zachowania liniowej pamięci oraz dostępu do elementów
@@ -241,10 +260,12 @@
       \end{itemize}
       łącznie $\mathcal{O}(|V|)$.
 
-      \begin{itemize}[noitemsep]
-      \item Uwspółbieżnienie kroku dla każdego wierzchołka
-      \item Zachowanie liniowej pamięci dzięki użyciu Schedulera i BrandesScope
-      \end{itemize}
+      \paragraph{Stała liczba instancji} Aby przy dużej liczbie wierzchołków nie
+      tworzyć wielu tymczasowych struktur do obliczeń, klasa \texttt{Scheduler} dba o
+      stworzenie dokładnie tylu instancji \texttt{BrandesScope} ile może zostać
+      użytych wątków. Za każdym razem gdy instancja \texttt{BrandesScope} dostaje
+      nowy wierzchołek nie następuje alokacja nowej pamięci a jedynie wyczyszczenie
+      wcześniejszych struktur i rozpoczęcie obliczeń.
 
   \newpage
   \section{Statystyki}
@@ -267,19 +288,41 @@
       \label{tab:times}
       \begin{tabular}{|c|c|c|c|}
         \hline
-        \bfseries $m$ & \bfseries minimalny czas & \bfseries maksymalny czas & \bfseries $p\textsubscript{m}$ (średni czas)\\
+        \bfseries $m$ & \bfseries minimalny czas & \bfseries maksymalny czas &
+        \bfseries $p\textsubscript{m}$ (średni czas)\\
         \hline
-        1 & 7,321     & 8,464      & 7,65891 \\
-        2 & 4,602     & 5,067      & 4,71832 \\
-        3 & 3,509     & 4,111      & 3,60532 \\
-        4 & 2,819     & 3,207      & 2,88469 \\
-        5 & 2,636     & 3,384      & 2,75075 \\
-        6 & 2,491     & 2,594      & 2,50579 \\
-        7 & 2,359     & 3,162      & 2,42282 \\
-        8 & 2,253     & 2,78       & 2,33299 \\
+        1 & 7,321     & 8,464      & 7,659   \\
+        2 & 4,602     & 5,067      & 4,718   \\
+        3 & 3,509     & 4,111      & 3,605   \\
+        4 & 2,819     & 3,207      & 2,885   \\
+        5 & 2,636     & 3,384      & 2,751   \\
+        6 & 2,491     & 2,594      & 2,506   \\
+        7 & 2,359     & 3,162      & 2,423   \\
+        8 & 2,253     & 2,78       & 2,333   \\
         \hline
-        \end{tabular}
+      \end{tabular}
       \caption{Czas wykonania}
+    \end{table}
+    \subsection{Przyspieszenie}
+    \begin{table}[h]
+      \centering
+      \label{tab:speedup}
+      \begin{tabular}{|c|c|c|}
+        \hline
+        \bfseries $m$ & \bfseries $p\textsubscript{m}$ & \bfseries
+        $s\textsubscript{m} = p\textsubscript{1}/p\textsubscript{m}$ \\
+        \hline
+        1 & 7,659 & 1       \\
+        2 & 4,718 & 1,62336 \\
+        3 & 3,605 & 2,12455 \\
+        4 & 2,885 & 2,65477 \\
+        5 & 2,751 & 2,78408 \\
+        6 & 2,506 & 3,05626 \\
+        7 & 2,423 & 3,16096 \\
+        8 & 2,333 & 3,2829  \\
+        \hline
+      \end{tabular}
+      \caption{Przyspieszenie}
     \end{table}
 
 \end{document}
