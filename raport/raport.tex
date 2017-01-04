@@ -60,7 +60,7 @@
     \center
     \LARGE Uniwersytet Warszawski\\[0.1cm]
     \Large Wydział Matematyki Informatyki i Mechaniki\\[0.5cm] % Major heading such as course name
-    \large Programowanie Współbieżne\\[5.9cm] % Minor heading such as course title
+    \large Programowanie Współbieżne\\[6.1cm] % Minor heading such as course title
     { \huge \bfseries Algorytm Brandesa}\\[0.5cm] % Title of your document
     \large \emph{Autor:}\\ Mikołaj Walczak \\
     \vspace{\fill}
@@ -73,21 +73,29 @@
   \end{titlepage}
 
   \tableofcontents
-  \listoffigures
-  \listoftables
+  {%
+  \let\oldnumberline\numberline%
+  \renewcommand{\numberline}{\figurename~\oldnumberline}%
+  \listoffigures%
+  }
+  {%
+  \let\oldnumberline\numberline%
+  \renewcommand{\numberline}{\tablename~\oldnumberline}%
+  \listoftables%
+  }
   \newpage
 
   \pagenumbering{arabic}
   \section{Implementacja}
-    Poniższy rozdział zawiera jedynie krótki opis implementacji. Szczegóły
-    dotyczące klas i metod przez nie udostępnianych można znaleźć w
+    Poniższy rozdział zawiera opis implementacji. Szczegóły dotyczące klas i
+    metod przez nie udostępnianych są dostępne w dokumentacji technicznej.
     \hyperref[documentation]{dokumentacji technicznej}.
     \label{implementation}
     \subsection{Podział na pliki}
       \label{files}
       Implementacja została podzielona względem odpowiedzialności za poszczególne
-      części programu na pliki jak na obrazku poniżej (\hyperref[fig:files]
-      {Rysunek \ref*{fig:files}}).
+      części programu na pliki (\hyperref[fig:files]
+      {\figurename~\ref*{fig:files}}).
 
       \begin{figure}[h]
         \label{fig:files}
@@ -195,7 +203,7 @@
 
       \subsubsection{Synchronization::Scope}
       \label{class:synchronization__scope}
-      Klasa abstrakcyjna (właść. interface), z którego musi dziedziczyć klasa
+      Klasa abstrakcyjna (właść. interface), z której musi dziedziczyć klasa
       środowiska obliczeniowego \hyperref[class:synchronization__scheduler]
       {\texttt{Scheduler}}'a. Dla danego zadania wykonuje wirtualną funkcję
       \texttt{execute(task)}.
@@ -206,13 +214,13 @@
       instancję podanej klasy \hyperref[class:synchronization__scope]{\texttt{Scope}}.
       Dla każdego otrzymanego zadania \texttt{task} zleca jednemu z wolnych wątków
       wykonanie funkcji \texttt{execute(task)}. Jeżeli wszystkie wątki są zajęte,
-      zadania oczekują na wykonanie na kolejce do momentu, gdy któryś
-      z wątków skończy obliczanie poprzedniej wartości.
+      zadania oczekują na wykonanie w kolejce do momentu zakończenia przez któryś
+      z wątków obliczania poprzedniej wartości.
 
     \subsection{Dokumentacja techniczna}
       \label{documentation}
-      Do wygenerowania dokumentacji wymagana jest pakiet Doxygen
-      w wersji $\geq$ 1.8.8. Wykonanie poniższych instrukcji w katalogu
+      Do wygenerowania dokumentacji wymagany jest pakiet \texttt{Doxygen}
+      w wersji $\geq 1.8.8$. Wykonanie poniższych instrukcji w katalogu
       projektu spowoduje wygenerowanie dokumentacji w folderach jak na
       \hyperref[fig:documentation]{Rysunku \ref*{fig:documentation}}.
       \begin{verbatim}
@@ -244,12 +252,12 @@
       \end{figure}
 
     \subsection{Optymalizacje}
-      \paragraph{Współbieżność} Dzięki niezależności obliczeń wpływu pośrednictwa
+      \subsubsection{Współbieżność} Dzięki niezależności obliczeń wpływu pośrednictwa
       pomiędzy poszczególnymi wierzchołkami możliwe było przeniesieni obliczeń dla
       każdego wierzchołka do osobnego wątku. Użycie większej ilości wątków znacząco
       przyspieszyło algorytm (\hyperref[tab:speedup]{Tabela \ref*{tab:speedup}}).
 
-      \paragraph{Preprocessing} Ze względu na możliwy niespójny zbiór indeksów
+      \subsubsection{Preprocessing} Ze względu na możliwy niespójny zbiór indeksów
       wierzchołków, w celu zachowania liniowej pamięci oraz dostępu do elementów
       struktur pomocniczych w czasie $\mathcal{O}(1)$, zastosowany został
       preprocessing przydzielający każdemu wierzchołkowi unikalny numer
@@ -260,11 +268,11 @@
       \end{itemize}
       łącznie $\mathcal{O}(|V|)$.
 
-      \paragraph{Stała liczba instancji} Aby przy dużej liczbie wierzchołków nie
+      \subsubsection{Stała liczba instancji} Aby przy dużej liczbie wierzchołków nie
       tworzyć wielu tymczasowych struktur do obliczeń, klasa \texttt{Scheduler} dba o
       stworzenie dokładnie tylu instancji \texttt{BrandesScope} ile może zostać
-      użytych wątków. Za każdym razem gdy instancja \texttt{BrandesScope} dostaje
-      nowy wierzchołek nie następuje alokacja nowej pamięci a jedynie wyczyszczenie
+      użytych wątków. Każdorazowo gdy instancja \texttt{BrandesScope} dostaje
+      nowy wierzchołek nie następuje alokacja nowej pamięci, a jedynie wyczyszczenie
       wcześniejszych struktur i rozpoczęcie obliczeń.
 
   \newpage
