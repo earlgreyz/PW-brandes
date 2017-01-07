@@ -3,7 +3,8 @@
 
 namespace Brandes {
 
-    Node::Node(IdentifierType id) : id(id), order(0u), weight(0) {
+    Node::Node(IdentifierType id, size_t order)
+            : id(id), order(order), weight(0) {
 
     }
 
@@ -11,7 +12,7 @@ namespace Brandes {
         return order;
     }
 
-    const std::vector<std::weak_ptr<Node>> &Node::get_neighbours() const
+    const std::vector<size_t> &Node::get_neighbours() const
             noexcept {
         return neighbours;
     }
@@ -22,9 +23,10 @@ namespace Brandes {
     }
 
     std::shared_ptr<Node> Graph::create_node(IdentifierType id) {
-        std::shared_ptr<Node> node = std::make_shared<Node>(id);
+        std::shared_ptr<Node> node = std::make_shared<Node>(id, nodes.size());
         nodes[id] = node;
-        return node;
+        ordered_nodes.push_back(node);
+        return std::move(node);
     }
 
     std::shared_ptr<Node> Graph::get_node(IdentifierType id) {
@@ -37,21 +39,13 @@ namespace Brandes {
         return node;
     }
 
-    void Graph::reorder() noexcept {
-        size_t order = 0u;
-        for (auto &node : nodes) {
-            node.second->order = order++;
-        }
-    }
-
     void Graph::load(std::istream &istream) {
         IdentifierType from, to;
         while (istream >> from >> to) {
             std::shared_ptr<Brandes::Node> node = get_node(from);
-            std::weak_ptr<Brandes::Node> neighbour = get_node(to);
-            node->neighbours.push_back(neighbour);
+            std::shared_ptr<Brandes::Node> neighbour = get_node(to);
+            node->neighbours.push_back(neighbour->get_order());
         }
-        reorder();
     }
 
     void Graph::save(std::ostream &ostream) const {
@@ -64,17 +58,16 @@ namespace Brandes {
     }
 
     void Graph::clear_weights() noexcept {
-        for (auto &node : nodes) {
-            node.second->weight = 0;
+        for (size_t i = 0; i < ordered_nodes.size(); i++) {
+            ordered_nodes[i]->weight = 0;
         }
     }
 
-    const std::map<IdentifierType, std::shared_ptr<Node>> Graph::get_nodes()
-            const noexcept {
-        return nodes;
+    const size_t Graph::get_size() const noexcept {
+        return ordered_nodes.size();
     }
 
-    const size_t Graph::get_size() const noexcept {
-        return nodes.size();
+    std::shared_ptr<Node> &Graph::operator[](size_t order) {
+        return ordered_nodes[order];
     }
 }

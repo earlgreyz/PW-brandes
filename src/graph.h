@@ -29,7 +29,7 @@ namespace Brandes {
         /**
          * vector of all node neighbours
          */
-        std::vector<std::weak_ptr<Node>> neighbours;
+        std::vector<size_t> neighbours;
         /**
          * unique id of the node
          */
@@ -51,12 +51,12 @@ namespace Brandes {
          * Constructs a new node with given id.
          * @param id new node id.
          */
-        Node(IdentifierType id);
+        Node(IdentifierType id, size_t order);
         /**
          * Returns vector of all node neighbours.
          * @return vector of all node neighbours.
          */
-        const std::vector<std::weak_ptr<Node>> &get_neighbours() const noexcept;
+        const std::vector<size_t> &get_neighbours() const noexcept;
         /**
          * Returns node order.
          * @return node order.
@@ -76,7 +76,11 @@ namespace Brandes {
     class Graph {
     private:
         /**
-         * map of nodes in a graph ordered by id
+         * Vector of all nodes referenced by order.
+         */
+        std::vector<std::shared_ptr<Node>> ordered_nodes;
+        /**
+         * Map of nodes in a graph ordered by id.
          */
         std::map<IdentifierType, std::shared_ptr<Node>> nodes;
         /**
@@ -94,12 +98,6 @@ namespace Brandes {
          * @return pointer to the node with given id
          */
         std::shared_ptr<Node> get_node(IdentifierType id);
-        /**
-         * Reorders nodes.
-         * Iterates through nodes map assigning each node with unique id
-         * from `0` to `nodes.size() - 1`.
-         */
-        void reorder() noexcept;
     public:
         /**
          * Loads graph representation.
@@ -127,16 +125,16 @@ namespace Brandes {
          */
         void clear_weights() noexcept;
         /**
-         * Returns map of nodes in a graph.
-         * @return map of nodes in a graph.
-         */
-        const std::map<IdentifierType, std::shared_ptr<Node>> get_nodes() const
-                noexcept;
-        /**
          * Returns number of nodes in the graph.
-         * @return number of nodes in the graph.
+         * @return number of nodes in the graph
          */
         const size_t get_size() const noexcept;
+        /**
+         * Returns reference to node with a given order.
+         * @param order order
+         * @return node with a given order
+         */
+        std::shared_ptr<Node> &operator[](size_t order);
     };
 }
 
