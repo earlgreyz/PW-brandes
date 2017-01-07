@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{csvsimple}
 \usepackage{hyperref}
+\usepackage{enumitem}
 \hypersetup{
     colorlinks,
     linkcolor=[rgb]{.0 .152 .645}
@@ -261,12 +262,8 @@
       wierzchołków, w celu zachowania liniowej pamięci oraz dostępu do elementów
       struktur pomocniczych w czasie $\mathcal{O}(1)$, zastosowany został
       preprocessing przydzielający każdemu wierzchołkowi unikalny numer
-      $order \in \left[0, |V|\right)$. Wykonanie preprocessingu zajmuje:
-      \begin{itemize}[noitemsep]
-        \item \texttt{std::map::begin} -- $\mathcal{O}(1)\cdot1$
-        \item \texttt{std::map::iterator::operator++} -- $\mathcal{O}(1)\cdot|V|$
-      \end{itemize}
-      łącznie $\mathcal{O}(|V|)$.
+      $order \in \left[0, |V|\right)$. Preprocessing wykonywany jest podczas tworzenia
+      wierzchołka i nie zwiększa złożoności czasowej budowania grafu $\mathcal{O}(|E|\log|V|)$.
 
       \subsubsection{Stała liczba instancji} Aby przy dużej liczbie wierzchołków nie
       tworzyć wielu tymczasowych struktur do obliczeń, klasa \texttt{Scheduler} dba o
@@ -277,11 +274,6 @@
 
   \newpage
   \section{Statystyki}
-    \subsection{Środowisko pomiarowe}
-    Testy zostały przeprowadzone dla zestawu danych \texttt{wiki-vote-sort.txt}.
-    Wykorzystano komputer wyposażony w 8-rdzeniowy procesor Intel\textsuperscript{
-    \textregistered} Core\texttrademark i7 4700HQ oraz dysk ADATA\textsuperscript{
-    \textregistered} Solid State Drive.
     \subsection{Przeprowadzenie pomiarów}
     Dla każdego \texttt{m = 1, 2, \ldots, 8} uruchomiono 100-krotnie program
     \texttt{brandes} poleceniem
@@ -291,43 +283,83 @@
     \vspace{-3ex}
     a wyniki zapisano do plików. Za szukane wartości $p\textsubscript{m}$ przyjęto
     średnią arytmetyczną z otrzymanych wyników.
+
+    \subsection{Środowisko pomiarowe}
+    Testy zostały przeprowadzone dla zestawu danych \texttt{wiki-vote-sort.txt}.
+    Do pomiarów wykorzystano:
+    \begin{enumerate}[label={(\arabic*)}]
+      \item
+        \label{test:first}
+        komputer osobisty wyposażony w 8-rdzeniowy procesor Intel\textsuperscript{
+        \textregistered} Core\texttrademark i7 4700HQ oraz dysk ADATA\textsuperscript{
+        \textregistered} Solid State Drive.
+      \item
+        \label{test:second}
+        serwer \texttt{students.mimuw.edu.pl}
+    \end{enumerate}
+
     \begin{table}[h]
       \centering
-      \label{tab:times}
+      \label{tab:times:first}
       \begin{tabular}{|c|c|c|c|}
         \hline
         \bfseries $m$ & \bfseries minimalny czas & \bfseries maksymalny czas &
-        \bfseries $p\textsubscript{m}$ (średni czas)\\
+        \bfseries średni czas ($p\textsubscript{m}$)\\
         \hline
-        1 & 7,321     & 8,464      & 7,659   \\
-        2 & 4,602     & 5,067      & 4,718   \\
-        3 & 3,509     & 4,111      & 3,605   \\
-        4 & 2,819     & 3,207      & 2,885   \\
-        5 & 2,636     & 3,384      & 2,751   \\
-        6 & 2,491     & 2,594      & 2,506   \\
-        7 & 2,359     & 3,162      & 2,423   \\
-        8 & 2,253     & 2,78       & 2,333   \\
+        1 & 2,12  & 2,647 & 2,192 \\
+        2 & 1,148 & 1,704 & 1,261 \\
+        3 & 0,82  & 1,035 & 0,887 \\
+        4 & 0,641 & 0,781 & 0,682 \\
+        5 & 0,614 & 0,758 & 0,63  \\
+        6 & 0,594 & 0,69  & 0,617 \\
+        7 & 0,583 & 0,656 & 0,614 \\
+        8 & 0,572 & 0,646 & 0,612 \\
         \hline
       \end{tabular}
-      \caption{Czas wykonania}
+      \caption{Czas wykonania \hyperref[test:first]{(Środowisko 1)}}
+    \end{table}
+
+    \begin{table}[h]
+      \centering
+      \label{tab:times:second}
+      \begin{tabular}{|c|c|c|c|}
+        \hline
+        \bfseries $m$ & \bfseries minimalny czas & \bfseries maksymalny czas &
+        \bfseries średni czas ($p'\textsubscript{m}$)\\
+        \hline
+        1 & 4,906 & 9,902 & 7,527 \\
+        2 & 3,261 & 6,463 & 4,754 \\
+        3 & 2,332 & 4,517 & 3,483 \\
+        4 & 2,029 & 3,53  & 2,722 \\
+        5 & 1,622 & 3,036 & 2,274 \\
+        6 & 1,515 & 2,49  & 1,933 \\
+        7 & 1,26  & 2,308 & 1,823 \\
+        8 & 1,189 & 2,069 & 1,562 \\
+        \hline
+      \end{tabular}
+      \caption{Czas wykonania \hyperref[test:second]{(Środowisko 2)}}
     \end{table}
     \subsection{Przyspieszenie}
+    Przyjęto oznaczenia jak w poprzednich tabelach -- $p\textsubscript{m}$ dla
+    \hyperref[test:first]{środowiska 1} oraz $p'\textsubscript{m}$ dla
+    \hyperref[test:second]{środowiska 2}.
     \begin{table}[h]
       \centering
       \label{tab:speedup}
-      \begin{tabular}{|c|c|c|}
+      \begin{tabular}{|c|c|c|c|c|}
         \hline
-        \bfseries $m$ & \bfseries $p\textsubscript{m}$ & \bfseries
-        $s\textsubscript{m} = p\textsubscript{1}/p\textsubscript{m}$ \\
+        \bfseries $m$ & \bfseries $p\textsubscript{m}$ & \bfseries $p'\textsubscript{m}$
+        & \bfseries $s\textsubscript{m} = p\textsubscript{1}/p\textsubscript{m}$
+        & \bfseries $s'\textsubscript{m} = p'\textsubscript{1}/p'\textsubscript{m}$ \\
         \hline
-        1 & 7,659 & 1       \\
-        2 & 4,718 & 1,62336 \\
-        3 & 3,605 & 2,12455 \\
-        4 & 2,885 & 2,65477 \\
-        5 & 2,751 & 2,78408 \\
-        6 & 2,506 & 3,05626 \\
-        7 & 2,423 & 3,16096 \\
-        8 & 2,333 & 3,2829  \\
+        1 & 2,192 & 7,527 & 1       & 1       \\
+        2 & 1,261 & 4,754 & 1,7383  & 1,5833  \\
+        3 & 0,887 & 3,483 & 2,47125 & 2,16107 \\
+        4 & 0,682 & 2,722 & 3,21408 & 2,76525 \\
+        5 & 0,63  & 2,274 & 3,47937 & 3,31003 \\
+        6 & 0,617 & 1,933 & 3,55267 & 3,89395 \\
+        7 & 0,614 & 1,823 & 3,57003 & 4,12891 \\
+        8 & 0,612 & 1,562 & 3,5817  & 4,81882 \\
         \hline
       \end{tabular}
       \caption{Przyspieszenie}
